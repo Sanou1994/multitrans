@@ -1,0 +1,532 @@
+﻿@model Tempon.StatistiqueRapportData
+@{
+    ViewData["Title"] = "Dashboard Manager";
+    ViewData["UserName"] = Convert.ToString(Session["fullName"]);
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+@using Multitrans.Models
+@using PagedList.Mvc;
+<style>
+    table {
+        background: #f5f5f5;
+        border-collapse: separate;
+        box-shadow: inset 0 1px 0 #fff;
+        font-size: 12px;
+        line-height: 24px;
+        text-align: left;
+        width: 800px;
+    }
+
+    th, #total {
+        background-color: blue;
+        border-left: 1px solid black;
+        border-right: 1px solid black;
+        border-top: 1px solid black;
+        border-bottom: 1px solid black;
+        box-shadow: inset 0 1px 0 black;
+        color: black;
+        font-weight: bold;
+        padding: 10px 15px;
+        position: relative;
+        text-shadow: 0 1px 0 #000;
+    }
+
+        th:after {
+            background: linear-gradient(rgba(255,255,255,0), rgba(255,255,255,.08));
+            content: '';
+            display: block;
+            height: 25%;
+            left: 0;
+            margin: 1px 0 0 0;
+            position: absolute;
+            top: 25%;
+            width: 100%;
+        }
+
+        th:first-child {
+            border-left: 1px solid #777;
+            box-shadow: inset 1px 1px 0 black;
+        }
+
+        th:last-child {
+            box-shadow: inset -1px 1px 0 black;
+        }
+
+    td {
+        border-right: 1px solid #fff;
+        border-left: 1px solid #e8e8e8;
+        border-top: 1px solid #fff;
+        border-bottom: 1px solid #e8e8e8;
+        transition: all 300ms;
+    }
+
+        td:first-child {
+            box-shadow: inset 1px 0 0 #fff;
+        }
+
+        td:last-child {
+            border-right: 1px solid #e8e8e8;
+            box-shadow: inset -1px 0 0 #fff;
+        }
+
+    tr {
+    }
+
+        tr:nth-child(odd) td {
+            background: #f1f1f1;
+        }
+
+        tr:last-of-type td {
+            box-shadow: inset 0 -1px 0 #fff;
+        }
+
+            tr:last-of-type td:first-child {
+                box-shadow: inset 1px -1px 0 #fff;
+            }
+
+            tr:last-of-type td:last-child {
+                box-shadow: inset -1px -1px 0 #fff;
+            }
+
+
+
+
+
+    /* The Modal (background) */
+    .modal {
+        display: none; /* Hidden by default */
+        position: fixed; /* Stay in place */
+        padding-top: 100px; /* Location of the box */
+        left: 0;
+        top: 0;
+        width: 100%; /* Full width */
+        height: 100%; /* Full height */
+        overflow: auto; /* Enable scroll if needed */
+        background-color: rgb(0,0,0); /* Fallback color */
+        background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+    }
+
+    /* Modal Content */
+    .modal-content {
+        background-color: #fefefe;
+        margin: auto;
+        padding: 20px;
+        border: 1px solid #888;
+        width: 80%;
+    }
+
+    /* The Close Button */
+    .close {
+        color: #aaaaaa;
+        float: right;
+        font-size: 28px;
+        font-weight: bold;
+    }
+
+        .close:hover,
+        .close:focus {
+            color: #000;
+            text-decoration: none;
+            cursor: pointer;
+        }
+</style>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+<div class="main-container">
+    <div class="pd-ltr-20 xs-pd-20-10">
+        <div class="title pb-20">
+            <div class="page-header">
+                <div class="row">
+                    <div class="col-md-6 col-sm-12">
+                        <div class="title">
+                            <h4>Tableau de bord Extrat Dépense</h4>
+                        </div>
+                        <nav aria-label="breadcrumb" role="navigation">
+                            <ol class="breadcrumb">
+                                <li class="breadcrumb-item active" aria-current="page">Extrat Dépense</li>
+                            </ol>
+                        </nav>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <div class="container-fluid py-4" style="margin-top:-40px">
+            <div class="row">
+                <div class="col-12">
+                    <div class="card my-4">
+                        <div class="card-header">
+                            <center class="text-primary" style="width:100%">Filtrage de la liste </center>
+                        </div>
+                        <center> <h4 style="background-color:white;color:red" id="smsB"></h4></center>
+                        <center> <h4 style="background-color:white;color:green" id="messageB"></h4></center>
+
+                        <div class="card-body ">
+
+                            @using (Html.BeginForm("ListeExtatDepenses", "Admin", FormMethod.Get))
+                            {
+                                <div class="container">
+                                    <div class="row">
+                                        <div class="panel panel-primary">
+                                            <div class="panel-body">
+                                                <div class="row">
+                                                    <div class="col-sm-12 col-md-3 col-lg-3 col-xl-3  ">
+                                                        <div class="input-group input-group-outline mb-3">
+                                                            <label class="text" style="width:100%">Agence </label>
+                                                            <select name="agenceID" onchange="hideError()" id="agenceID" class="form-control">
+                                                                <option></option>
+                                                                @foreach (var operateur in Model.agences)
+                                                                {
+                                                                    if (operateur.id == Model.agenceID)
+                                                                    {
+                                                                        <option value="@operateur.id" selected>@operateur.nom</option>
+
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        <option value="@operateur.id">@operateur.nom</option>
+
+                                                                    }
+                                                                }
+                                                            </select>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-sm-12 col-md-3 col-lg-3 col-xl-3  ">
+                                                        <div class="input-group input-group-outline mb-3">
+                                                            <label class="text" style="width:100%">Caissier(e)</label>
+                                                            <select name="CaissierID" onchange="hideError()" id="CaissierID" class="form-control">
+                                                                <option></option>
+                                                                @foreach (var operateur in Model.users.Where(b => b.role == "C"))
+                                                                {
+
+
+
+                                                                    if (operateur.id == Model.caissierID)
+                                                                    {
+                                                                        <option value="@operateur.id" selected>@operateur.prenom  @operateur.nom</option>
+
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        <option value="@operateur.id">@operateur.prenom  @operateur.nom</option>
+
+                                                                    }
+                                                                }
+                                                            </select>
+                                                        </div>
+                                                    </div>
+
+
+
+                                                    <div class="col-sm-12 col-md-3 col-lg-3 col-xl-3">
+                                                        <div class="input-group input-group-outline mb-3">
+                                                            <label class="text" style="width:100%">Date Debut</label>
+
+                                                            <input onchange="checkDateDebut()" id="DateDebutS" type="datetime-local" class="form-control">
+
+
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="col-sm-12 col-md-3 col-lg-3 col-xl-3">
+                                                        <div class="input-group input-group-outline mb-3">
+                                                            <label class="text" style="width:100%">Date Fin</label>
+
+
+                                                            <input onchange="checkFinDebut()" id="DateFinS" type="datetime-local" class="form-control">
+
+
+                                                        </div>
+                                                        <input name="DateDebut" id="DateDebut" value="@Model.DateFin" type="text" class="form-control" hidden>
+                                                        <input name="DateFin" id="DateFin" value="@Model.DateFin" type="text" class="form-control" hidden>
+
+
+                                                    </div>
+                                                    <div class="col-sm-12 col-md-3 col-lg-3 col-xl-3  ">
+                                                        <div class="input-group input-group-outline mb-3">
+                                                            <label class="text" style="width:100%">Type </label>
+                                                            <select name="type" onchange="hideError()" id="type" class="form-control">
+                                                                @if (Model.type == "DEPENSE")
+                                                                {
+                                                                    <option selected>DEPENSE</option>
+                                                                    <option>EXTRAT</option>
+
+
+                                                                }
+                                                                else
+                                                                {
+                                                                    <option selected>EXTRAT</option>
+                                                                    <option >DEPENSE</option>
+
+                                                                }
+
+                                                            </select>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-sm-12 col-md-3 col-lg-3 col-xl-3  ">
+                                                        <div class="input-group input-group-outline mb-3">
+                                                            <label class="text" style="width:100%">Taille</label>
+                                                            <select name="pageSize" id="pageSize" class="form-control">
+                                                                @if (Model.pageSize > 0)
+                                                                {
+                                                                    switch (Model.pageSize)
+                                                                    {
+                                                                        case 20:
+                                                                            <option>10</option>
+                                                                            <option selected>20</option>
+                                                                            <option>30</option>
+                                                                            <option>40</option>
+                                                                            <option>50</option>
+                                                                            break;
+                                                                        case 30:
+                                                                            <option value="10" selected></option>
+                                                                            <option>20</option>
+                                                                            <option selected>30</option>
+                                                                            <option>40</option>
+                                                                            <option>50</option>
+                                                                            break;
+                                                                        case 40:
+                                                                            <option>10</option>
+                                                                            <option>20</option>
+                                                                            <option>30</option>
+                                                                            <option selected>40</option>
+                                                                            <option>50</option>
+                                                                            break;
+                                                                        case 50:
+                                                                            <option>10</option>
+                                                                            <option>20</option>
+                                                                            <option>30</option>
+                                                                            <option>40</option>
+                                                                            <option selected>50</option>
+                                                                            break;
+                                                                        default:
+                                                                            <option selected>10</option>
+                                                                            <option>20</option>
+                                                                            <option>30</option>
+                                                                            <option>40</option>
+                                                                            <option>50</option>
+                                                                            break;
+                                                                    }
+                                                                }
+                                                                else
+                                                                {
+                                                                    <option selected>10</option>
+                                                                    <option>20</option>
+                                                                    <option>30</option>
+                                                                    <option>40</option>
+                                                                    <option>50</option>
+
+                                                                }
+
+
+                                                            </select>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-sm-12 col-md-3 col-lg-3 col-xl-3 ">
+                                                        <div class="input-group input-group-outline mb-3">
+                                                            <label class="text" style="width:100%">#Action</label>
+                                                            <button class="btn btn-primary" id="btnRecherche" style="background-color:black"> Recherche</button>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-sm-12 col-md-3 col-lg-3 col-xl-3">
+                                                        <div class="input-group input-group-outline mb-3">
+                                                            <label class="text" style="width:100%">#Action</label>
+
+                                                            <a class="btn btn-primary" href="@Url.Action("SoldeCloturerJournees","Admin" )" style="background-color:black"> Initialiser</a>
+                                                        </div>
+                                                    </div>
+
+
+                                                </div>
+
+                                                <div class="row">
+                                                    <center> <h6 style="background-color:white;color:red" id="DateCompareMessage"></h6></center>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                            <div class="container">
+                                <div class="row">
+                                    <div class="panel panel-primary">
+                                        <div class="panel-body">
+                                            <div class="row">
+                                                <div class="col-sm-12 col-md-3 col-lg-3 col-xl-3  ">
+                                                    <div class="input-group input-group-outline mb-3">
+                                                        <button class="btn btn-primary" type="button" onclick="tableToCSV()">CSV</button>
+
+
+                                                    </div>
+                                                </div>
+                                                <div class="col-sm-12 col-md-3 col-lg-3 col-xl-3  ">
+                                                    <div class="input-group input-group-outline mb-3">
+                                                        <button class="btn btn-primary" type="button" onclick="ExportToExcel('xlsx')">EXCEL</button>
+                                                    </div>
+                                                </div>
+                                                <div class="col-sm-12 col-md-3 col-lg-3 col-xl-3  " style="margin-inline:9px">
+                                                    <div class="input-group input-group-outline mb-3">
+                                                        <button class="btn btn-primary" type="button" id="btPrint">PDF</button>
+
+                                                    </div>
+                                                </div>
+
+
+                                            </div>
+
+
+
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+
+                            <div class="table-responsive p-0">
+                                @if (Model.depenseExtrats.Count < 1)
+                                {
+
+                                    <center>
+                                        <h2>Aucune donnée   </h2>
+                                    </center>
+                                }
+                                else
+                                {
+                                    <table class="table align-items-center mb-0" id="tableID">
+                                        <thead>
+                                            <tr>
+                                                <th>Montant </th>
+                                                <th>Type </th>
+                                                <th>Date</th>
+                                                <th>Raison</th>
+
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @foreach (var trans in Model.depenseExtrats)
+                                            {
+                                                <tr>
+                                                    @{ var date = (new DateTime(1970, 1, 1)).AddMilliseconds(Convert.ToDouble(trans.date)); }
+                                                    <td>@trans.montant </td>
+                                                    <td>@trans.type </td>
+
+                                                    <td>@date </td>
+                                                    <td>
+                                                        <div class="col-lg-6 col-xl-6 col-sm-6 col-md-6">
+                                                            <a class="btn btn-primary" id="@trans.id" onclick="ouvrirRaison(this.id)" style="color: white; width: 100%"> Ouvrir</a>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+
+                                            }
+
+
+                                        </tbody>
+                                    </table>
+                                }
+
+
+
+                                <div class="container">
+                                    <div class="panel panel-primary">
+                                        <div class="panel-body">
+
+                                            <center>
+                                                <a class="btn btn-primary" href="@Url.Action("ListeExtatDepenses","Admin" ,new { pageNo=(Convert.ToInt32(Model.pageNo - 1) < 1) ? 1 :Convert.ToInt32(Model.pageNo - 1)  ,pageSize=@Model.pageSize,type=Model.type,agenceID=@Model.agenceID,caissierID=@Model.caissierID,operateurID=@Model.operateurID,operationID=@Model.operationID,Etat=@Model.Etat,sortBy=@Model.sortBy,DateDebut=@Model.DateDebut,DateFin=@Model.DateFin})">Précédent</a>
+                                                <span>@Model.pageNo </span>
+
+                                                <a class="btn btn-primary" href="@Url.Action("ListeExtatDepenses","Admin" ,new { pageNo=(Convert.ToInt32(Model.pageNo) == 0) ? 2 :Convert.ToInt32(Model.pageNo + 1) ,pageSize=Model.pageSize,type=Model.type,agenceID=Model.agenceID,caissierID=Model.caissierID,operateurID=Model.operateurID,operationID=Model.operationID,Etat=Model.Etat,sortBy=Model.sortBy,DateDebut=Model.DateDebut,DateFin=Model.DateFin})">Suivant</a>
+
+                                            </center>
+
+
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+
+<div id="bloquageModal" class="modal container-fluid " style="padding:15%">
+    <div class="container-fluid" style="width: 50%;">
+        <div class="card">
+            <center> <p style="background-color: white; color: red">Description</p></center>
+            <div class="card-body">
+
+                <div class="row">
+                    <p id="raison"> </p>
+
+                </div>
+                <div class="row ">
+                    <div class="col-lg-4 col-xl-4 col-sm-4 col-md-4">
+                    </div>
+                    <div class="col-lg-4 col-xl-4 col-sm-4 col-md-4">
+                        <a class="btn btn-primary" onclick=" document.getElementById('bloquageModal').style.display = 'none'" style="color: white">Fermer</a>
+
+                    </div>
+                    <div class="col-lg-4 col-xl-4 col-sm-4 col-md-4">
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+</div>
+<style>
+    .modal-header {
+        background: rgb(235,89,11);
+        background: linear-gradient(90deg, rgba(235,89,11,0.9640231092436975) 0%, rgba(253,175,29,1) 50%, rgba(255,255,255,1) 100%);
+    }
+
+    .inline {
+        max-width: 400px;
+        margin: auto;
+    }
+
+    .input-icons i {
+        position: absolute;
+    }
+
+    .input-icons {
+        width: 100%;
+        margin-bottom: 10px;
+    }
+
+    .icon {
+        padding: 10px;
+        min-width: 40px;
+        font-size: 24px;
+    }
+
+    .input-field {
+        width: 100%;
+        padding: 10px;
+        text-align: center;
+        margin-bottom: 3px;
+    }
+</style>
+
+<script>
+
+    function ouvrirRaison(data)
+    {
+        var extrat =@Html.Raw(Json.Encode(Model.depenseExtrats));
+        var et = extrat.filter(e => e.id == data)[0].description;
+        document.getElementById('raison').innerText = et
+        document.getElementById('bloquageModal').style.display = 'block'
+
+    }
+</script>
+
+
+
+

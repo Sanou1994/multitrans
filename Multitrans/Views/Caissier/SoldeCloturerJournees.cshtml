@@ -1,0 +1,409 @@
+﻿@model  Tuple<List<SoldeCloturerJournee>, List<Operateur>>
+@{ ViewBag.Title = "Liste des solde cloturés journées";
+    Layout = "~/Views/Shared/_CaissierLayout.cshtml";
+    ViewData["UserName"] = Convert.ToString(Session["fullName"]);
+}
+@using Multitrans.Models;
+<style>
+
+    /* The Modal (background) */
+    .modal {
+        display: none; /* Hidden by default */
+        position: fixed; /* Stay in place */
+        padding-top: 20px; /* Location of the box */
+        left: 0;
+        top: 0;
+        width: 100%; /* Full width */
+        height: 100%; /* Full height */
+        overflow: auto; /* Enable scroll if needed */
+        background-color: rgb(0,0,0); /* Fallback color */
+        background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+    }
+
+    /* Modal Content */
+    .modal-content {
+        background-color: #fefefe;
+        margin: auto;
+        padding: 20px;
+        border: 1px solid #888;
+        width: 80%;
+    }
+
+    /* The Close Button */
+    .close {
+        color: #aaaaaa;
+        float: right;
+        font-size: 28px;
+        font-weight: bold;
+    }
+
+        .close:hover,
+        .close:focus {
+            color: #000;
+            text-decoration: none;
+            cursor: pointer;
+        }
+</style>
+
+<div class="main-container">
+    <div class="xs-pd-20-10 pd-ltr-20">
+
+        <div class="page-header">
+            <div class="row">
+                <div class="col-md-6 col-sm-12">
+                    <div class="title">
+                        <h4>Administration</h4>
+                    </div>
+                    <nav aria-label="breadcrumb" role="navigation">
+                        <ol class="breadcrumb">
+                            <li class="breadcrumb-item">
+                                <a href="#">Acceuil</a>
+                            </li>
+                            <li class="breadcrumb-item active" aria-current="page">
+                                Liste des soldes cloturés journées
+                            </li>
+                        </ol>
+                    </nav>
+                </div>
+                <div class="col-md-6 col-sm-12 text-right">
+                   
+                </div>
+            </div>
+        </div>
+        <center> <h4 style="background-color:white;color:red" id="smsB"></h4></center>
+        <center> <h4 style="background-color:white;color:green" id="messageB"></h4></center>
+
+        <!-- Export Datatable start -->
+        <div class="card-box mb-30">
+            <div class="pb-20">
+
+                @if (Model.Item1.Count < 1)
+                {
+
+                    <center>
+                        <h2>Aucun solde cloturé journée disponible </h2>
+                    </center>
+                }
+                else
+                {
+                    <table class="table hover multiple-select-row data-table-export nowrap">
+                        <thead>
+                            <tr>
+                                <th>N° </th>
+                                <th>Caisse</th>
+                                @foreach (var patient in Model.Item2)
+                                {
+                                    <th>@patient.libelle</th>
+
+                                }
+                                <th>Etat</th>
+                                <th class="table-plus datatable-nosort">Actions</th>
+
+                            </tr>
+                        </thead>
+                        <tbody>
+
+                            @foreach (var patient in Model.Item1)
+                            {
+                                var etat = (patient.status) ? "Activé" : "Désactivé";
+
+                                <tr>
+                                    <td class="table-plus">@patient.id</td>
+                                    <td>@patient.caisse</td>
+                                    @foreach (var item in patient.soldeCloturerJourneeItems)
+                                    {
+                                        if (item.montant != 0)
+                                        {
+                                            <td>@item.montant</td>
+
+                                        }
+                                        else
+                                        {
+                                            <td>0</td>
+
+                                        }
+
+                                    }
+
+                                    <td>@etat</td>
+                                    <td>
+                                        <div class="dropdown">
+                                            <a class="btn btn-link font-24 p-0 line-height-1 no-arrow dropdown-toggle"
+                                               href="#"
+                                               role="button"
+                                               data-toggle="dropdown">
+                                                <i class="dw dw-more"></i>
+                                            </a>
+                                            <div class="dropdown-menu dropdown-menu-right dropdown-menu-icon-list">
+                                                <button class="dropdown-item" onclick="ouvrirDepartementModal(@patient.id)"><i class="dw dw-edit2"></i> Modifier</button>
+                                                <button class="dropdown-item" onclick=" bloquageModal(@patient.id)"><i class="dw dw-lock"></i> Bloquer</button>
+                                            </div>
+                                        </div>
+
+                                    </td>
+
+                                </tr>
+
+                            }
+
+
+                        </tbody>
+                    </table>
+                }
+
+            </div>
+        </div>
+        <!-- Export Datatable End -->
+
+
+
+
+
+
+
+    </div>
+</div>
+<!-- CREER OPERATION POPUP-->
+<div id="mediumModalCreate" class="modal container-fluid ">
+    <div class="container" style="width: 70%; margin-inline: 25%">
+        <div class="row">
+            <div class="col-12">
+                <div class="card p-4">
+
+                    <center> <p style="background-color: white; color: red" id="sms"></p></center>
+                    <center> <p style="background-color:white;color:green" id="message"></p></center>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-lg-12">
+                                <input type="text" class="form-control" onclick="hideError()" placeholder="nom " style="background-color:whitesmoke" id="Name" name="Name" required>
+                            </div>
+                        </div>
+                        <div class="row pt-1">
+                            <div class="col-lg-12">
+                                <button class="btn btn-primary" onclick="ajouterAgence()" style="float:right; background-color:black"> Enregistrer</button>
+                                <button class="btn btn-primary" onclick=" document.getElementById('mediumModalCreate').style.display = 'none'" style="float:left; background-color:black"> Fermer</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<input id="departementID" name="departementID" type="text" class="form-control" hidden>
+
+<!-- END CREER PERSONNEL POPUP-->
+<!-- MODIFIER PERSONNEL POPUP-->
+<div id="mediumModalModify" class="modal container-fluid ">
+
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="mediumModalLabelModify">Modifier opératieur</h5>
+
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-12">
+
+                        <center>
+                            <p id="messadeAjouterDepartementM" style="color: green"></p>
+                            <p id="smsAjouterDepartementM" style="color:red"></p>
+                        </center>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="nom" class="control-label mb-1">Nom </label>
+                                    <input id="nomM" name="nomM" type="text" class="form-control">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" onclick="modifierDepartement()"><span id="spinnerM" class="spinner-border text-light" role="status" hidden></span>Enregistrer</button>
+                <button type="button" class="btn btn-danger" onclick="document.getElementById('mediumModalModify').style.display = 'none';window.location.reload()">Annuler</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- END MODIFIER PERSONNEL POPUP-->
+<!-- BLOQUER PERSONNEL POPUP-->
+
+<div id="bloquageModal" class="modal container-fluid " style="padding:15%">
+    <div class="container-fluid" style="width: 50%;">
+        <div class="row" style="margin-bottom:50%">
+            <div class="card p-4">
+                <center> <p style="background-color: white; color: red">Voulez-vous changer le statut cette opération ?</p></center>
+                <div class="card-body">
+
+                    <input type="text" class="form-control" id="departementID" name="departementID" hidden />
+                    <div class="row">
+                        <div class="col-lg-6 col-xl-6 col-sm-6 col-md-6">
+                            <a class="btn btn-primary" onclick="bloquerDepartement()" style="color: white; width: 100%"> Oui</a>
+                        </div>
+
+                        <div class="col-lg-6 col-xl-6 col-sm-6 col-md-6">
+                            <a class="btn btn-primary" onclick=" document.getElementById('bloquageModal').style.display = 'none'" style="color: white; width: 100% ">Non</a>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+</div>
+<!-- END MODIFIER PERSONNEL POPUP-->
+
+<script>
+
+    function hideError() {
+
+        if ($('#Name').val() != null) { $('#NameError').hide(); }
+
+
+    }
+    function ajouterAgence()
+    {
+        document.getElementById("message").innerText = null
+        document.getElementById("sms").innerText = null
+         $.post('@Url.Action("AjouterOperateur")',
+            {
+                libelle: document.getElementById('Name').value
+
+            },
+            function (rep)
+            {
+                if (rep.code == 200)
+                {
+                    document.getElementById("message").innerText = rep.message;
+                    document.getElementById("sms").innerText = null
+                    setTimeout(() => { document.getElementById('mediumModalCreate').style.display = 'none'; window.location.reload() }, 1000);
+                }
+                else
+                {
+                    document.getElementById("sms").innerText = rep.message ;
+                    document.getElementById("message").innerText = null
+
+                }
+
+
+
+            }).fail(function (xhr, status, error) {
+                document.getElementById("sms").innerText = " une erreur interne est survenue ";
+                document.getElementById("message").innerText = null
+
+            });
+
+
+
+    }
+    function modifierDepartement()
+    {
+        document.getElementById("spinnerM").hidden = false
+        document.getElementById("messadeAjouterDepartementM").innerText = null
+        document.getElementById("smsAjouterDepartementM").innerText = null
+         $.post('@Url.Action("ajouterOperateur")',
+            {
+
+                libelle: document.getElementById('nomM').value,
+
+                id: document.getElementById('departementID').value
+
+            },
+            function (rep)
+            {
+                if (rep.code == 200)
+                {
+                    document.getElementById("spinnerM").hidden = true
+                    document.getElementById("messadeAjouterDepartementM").innerText = rep.message;
+                    document.getElementById("smsAjouterDepartementM").innerText = null
+                    setTimeout(() => { document.getElementById('mediumModalModify').style.display = 'none'; window.location.reload() }, 1000);
+                }
+                else
+                {
+                    document.getElementById("spinnerM").hidden = true
+                    document.getElementById("smsAjouterDepartementM").innerText = rep.message ;
+                    document.getElementById("messadeAjouterDepartementM").innerText = null
+
+                }
+
+
+
+            }).fail(function (xhr, status, error) {
+                document.getElementById("spinnerM").hidden = true
+                document.getElementById("smsAjouterDepartementM").innerText = " une erreur interne est survenue";
+                document.getElementById("messadeAjouterDepartementM").innerText = null
+
+            });
+
+
+
+    }
+    function ouvrirDepartementModal(departementID)
+    {
+        document.getElementById("messadeAjouterDepartementM").innerText = null
+        document.getElementById("smsAjouterDepartementM").innerText = null
+
+        var departements = @Html.Raw(Json.Encode(Model));
+        var departement = departements.filter(e => e.id == departementID)[0];
+
+        document.getElementById('departementID').value = departementID
+            document.getElementById('nomM').value = departement.libelle,
+
+            document.getElementById('mediumModalModify').style.display = 'block'
+
+
+
+
+     }
+    function bloquageModal(departementID)
+    {
+        document.getElementById('bloquageModal').style.display = 'block'
+        document.getElementById('departementID').value = departementID
+
+
+
+    }
+    function bloquerDepartement()
+    {
+        document.getElementById("messageB").innerText = null
+        document.getElementById("smsB").innerText = null
+
+               $.post('@Url.Action("desactiverOperateur")',
+
+                {
+                    No: document.getElementById('departementID').value
+                },
+            function (rep)
+            {
+                if (rep.code == 200)
+                {
+
+                    document.getElementById("messageB").innerText = rep.message;
+                    document.getElementById("smsB").innerText = null
+                    window.location.reload()
+                }
+                else
+                {
+                    document.getElementById("smsB").innerText = rep.message;
+                    document.getElementById("messageB").innerText = null
+                }
+            }
+            ).fail(function (xhr, status, error)
+            {
+                                //Ajax request failed.
+                document.getElementById("smsB").innerText = " une erreur interne est survenue coté client";
+                document.getElementById("messageB").innerText = null
+
+            });
+    }
+
+
+</script>

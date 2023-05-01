@@ -1,0 +1,1207 @@
+﻿@model Tempon.DashboadData
+@{
+    ViewData["Title"] = "Dashboard Caissier";
+    ViewData["UserName"] = Convert.ToString(Session["fullName"]);
+    Layout = "~/Views/Shared/_CaissierLayout.cshtml";
+}
+@using Multitrans.Models;
+<style>
+
+    /* The Modal (background) */
+    .modal {
+        display: none; /* Hidden by default */
+        position: fixed; /* Stay in place */
+        left: 0;
+        top: 0;
+        width: 100%; /* Full width */
+        height: 100%; /* Full height */
+        overflow: auto; /* Enable scroll if needed */
+        background-color: rgb(0,0,0); /* Fallback color */
+        background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+    }
+
+    /* Modal Content */
+    .modal-content {
+        background-color: #fefefe;
+        margin: auto;
+        border: 1px solid #888;
+        width: 80%;
+    }
+
+    /* The Close Button */
+    .close {
+        color: #aaaaaa;
+        float: right;
+        font-size: 28px;
+        font-weight: bold;
+    }
+
+        .close:hover,
+        .close:focus {
+            color: #000;
+            text-decoration: none;
+            cursor: pointer;
+        }
+</style>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+<div class="main-container">
+    <div class="xs-pd-20-10 pd-ltr-20">
+
+        <div class="title pb-20">
+            <div class="page-header">
+                <div class="row pb-2">
+                    <div class="col-md-4 col-sm-12">
+                        @if (Model.soldeDebuterJourneeTermine)
+                        {
+                            <button type="button" class="btn btn-outline-warning"><i class="fa fa-star"></i>Impossible Débuter Journée </button>
+
+                        }
+                        else
+                        {
+                            <button type="button" class="btn btn-outline-warning" onclick=" debuterJournerModal()"><i class="fa fa-star"></i>Débuter Journée</button>
+
+                        }
+
+
+                    </div>
+
+                    <div class="col-md-4 col-sm-12 ">
+
+                        @if (Model.soldeDebuterJourneeTermine)
+                        {
+                            <button type="button" class="btn btn-success" onclick=" transactionDepotModal()"><i class="fa fa-refresh"></i> Faire  transaction</button>
+
+                        }
+                        else
+                        {
+                            <button type="button" class="btn btn-success"><i class="fa fa-refresh"></i>Impossible de faire  transaction</button>
+
+                        }
+
+                    </div>
+
+                    <div class="col-md-4 col-sm-12 ">
+                        @if (Model.soldeDebuterJourneeTermine)
+                        {
+                            <button type="button" class="btn btn-danger" onclick=" cloturerJourneeModal()"><i class="fa fa-close"></i>Terminer Journée</button>
+
+                        }
+                        else
+                        {
+                            <button type="button" class="btn btn-danger"><i class="fa fa-close"></i>Impossible de Terminer Journée</button>
+
+                        }
+
+                    </div>
+
+
+                </div>
+                <div class="row">
+
+                    <div class="col-md-3 col-sm-12">
+                        @if (Model.soldeDebuterJourneeTermine)
+                        {
+                            <button type="button" class="btn btn-outline-warning" onclick=" document.getElementById('soldeReelModal').style.display = 'block'"><i class="fa fa-university"></i> Voir solde actuel</button>
+
+
+                        }
+                        else
+                        {
+                            <button type="button" class="btn btn-outline-warning"><i class="fa fa-university"></i>Impossible de voir solde actuel </button>
+
+
+                        }
+
+
+                    </div>
+
+                    <div class="col-md-3 col-sm-12 ">
+
+                        @if (Model.soldeDebuterJourneeTermine)
+                        {
+                            <button type="button" class="btn btn-success" onclick="depenseModal()"><i class="fa fa-refresh"></i> Faire  une dépense</button>
+
+                        }
+                        else
+                        {
+                            <button type="button" class="btn btn-success"><i class="fa fa-refresh"></i>Impossible de faire  une dépense</button>
+
+                        }
+
+                    </div>
+                    <div class="col-md-3 col-sm-12 ">
+                        @if (Model.soldeDebuterJourneeTermine)
+                        {
+                            <button type="button" class="btn btn-warning" onclick=" extratModal()"><i class="fa fa-plus-circle"></i>Faire un extrat</button>
+
+                        }
+                        else
+                        {
+                            <button type="button" class="btn btn-warning"><i class="fa fa-plus-circle"></i>Impossible de faire extrat</button>
+
+                        }
+
+                    </div>
+
+                    <div class="col-md-3 col-sm-12 ">
+                        @if (Model.soldeDebuterJourneeTermine)
+                        {
+                            <button type="button" class="btn btn-info" onclick=" cloturerJourneeModal()"><i class="fa fa-eye"></i>Voir statistique</button>
+
+                        }
+                        else
+                        {
+                            <button type="button" class="btn btn-info"><i class="fa fa-eye"></i>Impossible de voir statistique</button>
+
+                        }
+
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <div class="row pb-10">
+            <div class="col-xl-3 col-lg-3 col-md-6 mb-20">
+                <div class="card-box height-100-p widget-style3">
+                    <div class="d-flex flex-wrap">
+                        <div class="widget-data">
+                            <div class="weight-700 font-24 text-dark">@Model.transactions.Count / @Model.transactions.Sum(f => f.montant) </div>
+                            <div class="font-14 text-secondary weight-500">Transactions</div>
+                        </div>
+                        <div class="widget-icon">
+                            <div class="icon" data-color="#ff5b5b"><span class="icon-copy ti-exchange-vertical"></span></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xl-3 col-lg-3 col-md-6 mb-20">
+                <div class="card-box height-100-p widget-style3">
+                    <div class="d-flex flex-wrap">
+                        <div class="widget-data">
+                            <div class="weight-700 font-24 text-dark">@Model.transactions.Where(o => o.sens == "ENCAISSEMENT").Count() / @Model.transactions.Where(o => o.sens == "ENCAISSEMENT").Sum(f => f.montant)</div>
+                            <div class="font-14 text-secondary weight-500">Encaissements</div>
+                        </div>
+                        <div class="widget-icon">
+                            <div class="icon" data-color="#ff5b5b"><span class="icon-copy ti-import"></span></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xl-3 col-lg-3 col-md-6 mb-20">
+                <div class="card-box height-100-p widget-style3">
+                    <div class="d-flex flex-wrap">
+                        <div class="widget-data">
+                            <div class="weight-700 font-24 text-dark">@Model.transactions.Where(o => o.sens == "DECAISSEMENT").Count() / @Model.transactions.Where(o => o.sens == "DECAISSEMENT").Sum(f => f.montant)</div>
+                            <div class="font-14 text-secondary weight-500">Décaissement</div>
+                        </div>
+                        <div class="widget-icon">
+                            <div class="icon" data-color="#ff5b5b"><span class="icon-copy ti-export"></span></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xl-3 col-lg-3 col-md-6 mb-20">
+                <div class="card-box height-100-p widget-style3">
+                    <div class="d-flex flex-wrap">
+                        <div class="widget-data">
+                            <div class="weight-700 font-24 text-dark">@Model.soldeReelActuel.caisse</div>
+                            <div class="font-14 text-secondary weight-500">Solde Caisse</div>
+                        </div>
+                        <div class="widget-icon">
+                            <div class="icon" data-color="#09cc06"><i class="icon-copy fa fa-money" aria-hidden="true"></i></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row pb-10">
+            <div class="col-xl-3 col-lg-3 col-md-6 mb-20">
+                <div class="card-box height-100-p widget-style3">
+                    <div class="d-flex flex-wrap">
+                        <div class="widget-data">
+                            <div class="weight-700 font-24 text-dark">@Model.depenseExtrat.Where(g=>g.type =="DEPENSE").Sum(f => f.montant) </div>
+                            <div class="font-14 text-secondary weight-500">Mes dépense </div>
+                        </div>
+                        <div class="widget-icon">
+                            <div class="icon" data-color="#ff5b5b"><span class="icon-copy ti-exchange-vertical"></span></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xl-3 col-lg-3 col-md-6 mb-20">
+                <div class="card-box height-100-p widget-style3">
+                    <div class="d-flex flex-wrap">
+                        <div class="widget-data">
+                            <div class="weight-700 font-24 text-dark">@Model.depenseExtrat.Where(g => g.type == "EXTRAT").Sum(f => f.montant)</div>
+                            <div class="font-14 text-secondary weight-500">Mes extrats</div>
+                        </div>
+                        <div class="widget-icon">
+                            <div class="icon" data-color="#ff5b5b"><span class="icon-copy ti-import"></span></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+        </div>
+
+        <!-- Export Datatable start -->
+        <div class="card-box mb-30">
+            <div class="pb-20">
+
+                @if (Model.transactions.Count < 1)
+                {
+
+                    <center>
+                        <h2>Aucune transaction effectuée  </h2>
+                    </center>
+                }
+                else
+                {
+                    <table class="table hover multiple-select-row data-table-export nowrap">
+                        <thead>
+                            <tr>
+                                <th>Opérateur </th>
+                                <th>Opération</th>
+                                <th>Montant</th>
+                                <th>Etat</th>
+                                <th>Surplux</th>
+                                <th>Téléphone</th>
+                                <th>Réference</th>
+                                <th class="table-plus datatable-nosort">Actions</th>
+
+                            </tr>
+                        </thead>
+                        <tbody>
+
+                            @foreach (var trans in Model.transactions)
+                            {
+                                <tr>
+                                    <td class="table-plus">@Model.operateurs.Where(p => p.id == trans.operateurID).Select(z => z.libelle).FirstOrDefault()</td>
+                                    <td>@Model.operations.Where(p => p.id == trans.operationID).Select(z => z.libelle).FirstOrDefault() </td>
+                                    <td>@trans.montant </td>
+                                    <td>@trans.etat </td>
+                                    <td>@trans.surplux </td>
+                                    <td>@trans.numero </td>
+                                    <td>@trans.reference </td>
+                                    <td>
+                                        <button class="dropdown-item" onclick="modifierTransactionDepotModal(@trans.id)"><i class="dw dw-edit2"></i> Modifier</button>
+
+
+                                    </td>
+
+                                </tr>
+
+                            }
+
+
+
+                        </tbody>
+                    </table>
+
+                }
+            </div>
+        </div>
+        <!-- Export Datatable End -->
+    </div>
+</div>
+<!--POPUP DEBUTER JOURNEE-->
+<div id="debuterJournerModal" class="modal container-fluid ">
+    <div class="container" style="width:70%;float:right">
+        <div class="row">
+            <div class="card" style="width:70%">
+                <center> <p style="background-color: white" class="text-warning">Veuillez renseigner les champs pour débuter ta journée</p></center>
+                <div class="card-body">
+                    <center> <p style="background-color: white; color: red" id="smsSoldeDebuterJournee"></p></center>
+                    <center> <p style="background-color:white;color:green" id="messageSoldeDebuterJournee"></p></center>
+                    <div class="row">
+                        <div class="col-lg-6 col-xl-6 col-sm-6 col-md-6">
+                            <div class="input-group input-group-outline">
+                                <label class="text" style="width:100%">Caisse</label>
+                                <input type="text" onkeypress="return isNumberKey2(this.id);" id="Caisse" name="Caisse" class="form-control" required>
+                            </div>
+                        </div>
+                        @foreach (var operateur in Model.operateurs)
+                        {
+                            <div class="col-lg-6 col-xl-6 col-sm-6 col-md-6">
+                                <div class="input-group input-group-outline">
+                                    <label class="text" style="width:100%">@operateur.libelle</label>
+                                    <input type="text" onkeypress="return isNumberKey2(this.id);" id="@operateur.id" name="Name" class="form-control" required>
+                                </div>
+                            </div>
+                        }
+                    </div>
+
+
+
+                    <div class="row">
+                        <div class="col-lg-6 col-xl-6 col-sm-6 col-md-6 p-2">
+                            <a class="btn btn-primary" onclick="debuterJournee()" style="color: white; width: 100%"> Débuter</a>
+                        </div>
+
+                        <div class="col-lg-6 col-xl-6 col-sm-6 col-md-6 p-2">
+                            <a class="btn btn-primary" onclick=" document.getElementById('debuterJournerModal').style.display = 'none'" style="color: white; width: 100% ">Annuler</a>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+</div>
+<!--POPUP CLOTURER JOURNEE-->
+<div id="cloturerJournerModal" class="modal container-fluid ">
+    <div class="container" style="width:70%;float:right">
+        <div class="row">
+            <div class="card" style="width:70%">
+                <center> <p style="background-color: white" class="text-warning">Veuillez renseigner les champs pour cloturer ta journée</p></center>
+                <div class="card-body">
+                    <center> <p style="background-color: white; color: red" id="smsSoldeCloturerJournee"></p></center>
+                    <center> <p style="background-color:white;color:green" id="messageSoldeCloturerJournee"></p></center>
+                    <div class="row">
+                        <div class="col-lg-6 col-xl-6 col-sm-6 col-md-6">
+                            <div class="input-group input-group-outline">
+                                <label class="text" style="width:100%">Caisse</label>
+                                <input type="text" onkeypress="return isNumberKey2(this.id);" id="CaisseC" name="CaisseC" class="form-control" required>
+                            </div>
+                        </div>
+                        @foreach (var operateur in Model.operateurs)
+                        {
+                            <div class="col-lg-6 col-xl-6 col-sm-6 col-md-6">
+                                <div class="input-group input-group-outline">
+                                    <label class="text" style="width:100%">@operateur.libelle</label>
+                                    <input type="text" onkeypress="return isNumberKey2(this.id);" id="@operateur.id-R" class="form-control" required>
+                                </div>
+                            </div>
+                        }
+                    </div>
+
+
+
+                    <div class="row">
+                        <div class="col-lg-6 col-xl-6 col-sm-6 col-md-6 p-2">
+                            <a class="btn btn-primary" onclick="cloturerJournee()" style="color: white; width: 100%"> Cloturer</a>
+                        </div>
+
+                        <div class="col-lg-6 col-xl-6 col-sm-6 col-md-6 p-2">
+                            <a class="btn btn-primary" onclick=" document.getElementById('cloturerJournerModal').style.display = 'none'" style="color: white; width: 100% ">Annuler</a>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+</div>
+<!--POPUP SOLDE REEL-->
+<div id="soldeReelModal" class="modal container-fluid ">
+    <div class="container" style="width:70%;float:right">
+        <div class="row">
+            <div class="card" style="width:70%">
+                <center> <p style="background-color: white" class="text-warning">SOLDE REEL ACTUEL</p></center>
+                <div class="card-body">
+                    <center> <p style="background-color: white; color: red" id="smssoldeReelModal"></p></center>
+                    <center> <p style="background-color:white;color:green" id="messagesoldeReelModal"></p></center>
+                    <div class="row">
+                        <div class="col-lg-6 col-xl-6 col-sm-6 col-md-6">
+                            <div class="input-group input-group-outline">
+                                <label class="text" style="width:100%">Caisse</label>
+                                <input type="text" value="@Model.soldeReelActuel.caisse" onkeypress="return isNumberKey2(this.id);" id="Caisse" name="Caisse" class="form-control" readonly>
+                            </div>
+                        </div>
+                        @foreach (var operateur in Model.operateurs)
+                        {
+                            <div class="col-lg-6 col-xl-6 col-sm-6 col-md-6">
+                                <div class="input-group input-group-outline">
+                                    <label class="text" style="width:100%">@operateur.libelle</label>
+                                    <input type="text" value="@Model.soldeReelActuel.SoldeReelItems.Where(p=>p.operateurID == operateur.id).Select(n=>n.montant).FirstOrDefault()" onkeypress="return isNumberKey2(this.id);" id="@operateur.id" name="Name" class="form-control" readonly>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-4 col-xl-4 col-sm-4 col-md-4">
+
+                        </div>
+                        <div class="col-lg-4 col-xl-4 col-sm-4 col-md-4">
+                            <a class="btn btn-primary" onclick=" document.getElementById('soldeReelModal').style.display = 'none'" style="color: white; width: 100% ">Fermer </a>
+                        </div>
+                        <div class="col-lg-4 col-xl-4 col-sm-4 col-md-4">
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+</div>
+<!--POPUP FAIRE DEPOT-->
+<div id="transactionDepotModal" class="modal container-fluid ">
+    <div class="container" style="width:70%;float:right">
+        <div class="row">
+            <div class="card" style="width:70%">
+                <center> <p style="background-color: white" class="text-success">Veuillez renseigner les champs pour faire la transaction</p></center>
+                <div class="card-body">
+                    <center> <p style="background-color: white; color: red" id="smsDepot"></p></center>
+                    <center> <p style="background-color:white;color:green" id="messageDepot"></p></center>
+                    <div class="row">
+                        <div class="col-lg-4 col-xl-4 col-sm-4 col-md-4">
+                            <div class="input-group input-group-outline">
+                                <label class="text" style="width:100%">Opérateur</label>
+                                <select name="Operateur" id="Operateur" class="form-control" required>
+                                    <option value="0">Choisir un Opérateur</option>
+                                    @foreach (var operateur in Model.operateurs)
+                                    {
+                                        <option value="@operateur.id">@operateur.libelle</option>
+
+                                    }
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-lg-4 col-xl-4 col-sm-4 col-md-4">
+                            <div class="input-group input-group-outline">
+                                <label class="text" style="width:100%">Opération</label>
+                                <select name="Operation" onchange="chooseOperation()" id="Operation" class="form-control" required>
+                                    <option value="0">Choisir une Opération</option>
+                                    @foreach (var operateur in Model.operations)
+                                    {
+                                        <option value="@operateur.id">@operateur.libelle</option>
+
+                                    }
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-lg-4 col-xl-4 col-sm-4 col-md-4">
+                            <div class="input-group input-group-outline">
+                                <label class="text" style="width:100%">Etat </label>
+                                <select name="Etat" id="Etat" class="form-control" required>
+                                    <option value="NONCREDIT" selected>NON CREDIT</option>
+                                    <option value="CREDIT">CREDIT</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-lg-4 col-xl-4 col-sm-4 col-md-4">
+                            <div class="input-group input-group-outline">
+                                <label class="text" style="width:100%">Téléphone</label>
+                                <input type="text" onkeypress="return isNumberKey2(this.id);" id="Telephone" name="Telephone" class="form-control" required>
+                            </div>
+                        </div>
+                        <div class="col-lg-4 col-xl-4 col-sm-4 col-md-4">
+                            <div class="input-group input-group-outline">
+                                <label class="text" style="width:100%">Montant</label>
+                                <input type="text" onkeypress="return isNumberKey2(this.id);" id="Montant" name="Montant" class="form-control" required>
+                            </div>
+                        </div>
+                        <div class="col-lg-4 col-xl-4 col-sm-4 col-md-4">
+                            <div class="input-group input-group-outline">
+                                <label class="text" style="width:100%">Frais</label>
+                                <input type="text" onkeypress="return isNumberKey2(this.id);" id="Frais" name="Frais" class="form-control">
+                            </div>
+                        </div>
+                        <div class="col-lg-4 col-xl-4 col-sm-4 col-md-4">
+                            <div class="input-group input-group-outline">
+                                <label class="text" style="width:100%">Commission</label>
+                                <input type="text" onkeypress="return isNumberKey2(this.id);" id="Commission" name="Commission" class="form-control">
+                            </div>
+                        </div>
+                        <div class="col-lg-4 col-xl-4 col-sm-4 col-md-4">
+                            <div class="input-group input-group-outline">
+                                <label class="text" style="width:100%">Surplux</label>
+                                <input type="text" onkeypress="return isNumberKey2(this.id);" id="Surplux" name="Surplux" class="form-control">
+                            </div>
+                        </div>
+                        <div class="col-lg-4 col-xl-4 col-sm-4 col-md-4">
+                            <div class="input-group input-group-outline">
+                                <label class="text" style="width:100%">Taxe</label>
+                                <input type="text" onkeypress="return isNumberKey2(this.id);" id="Taxe" name="Taxe" class="form-control">
+                            </div>
+                        </div>
+                    </div>
+                    <input type="text" id="sens" name="sens" class="form-control" hidden>
+
+
+
+
+                    <div class="row">
+                        <div class="col-lg-6 col-xl-6 col-sm-6 col-md-6 p-2">
+                            <a class="btn btn-primary" onclick="faireDepot()" style="color: white; width: 100%">Effecter</a>
+                        </div>
+
+                        <div class="col-lg-6 col-xl-6 col-sm-6 col-md-6 p-2">
+                            <a class="btn btn-primary" onclick=" document.getElementById('transactionDepotModal').style.display = 'none'" style="color: white; width: 100% ">Annuler</a>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+</div>
+<!--POPUP DEPENSE JOURNEE-->
+<div id="depenseModal" class="modal container-fluid ">
+    <div class="container" style="width:70%;float:right">
+        <div class="row">
+            <div class="card" style="width:70%">
+                <center> <p style="background-color: white" class="text-warning">Veuillez renseigner les champs pour cette dépense</p></center>
+                <div class="card-body">
+                    <center> <p style="background-color: white; color: red" id="smsDepense"></p></center>
+                    <center> <p style="background-color:white;color:green" id="messageDepense"></p></center>
+                    <div class="row">
+                        <div class="col-lg-4 col-xl-4 col-sm-4 col-md-4">
+
+                        </div>
+                        <div class="col-lg-4 col-xl-4 col-sm-4 col-md-4">
+                            <div class="input-group input-group-outline">
+                                <label class="text text-center" style="width:100%">Montant</label>
+                                <input type="text" onkeypress="return isNumberKey2(this.id);" id="montant" name="montant" class="form-control" required>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-12 col-xl-12 col-sm-12 col-md-12">
+                            <div class="html-editor pd-20 card-box mb-30">
+                                <label class="text" style="width:100%;color:red">500 caractères au maximun</label>
+                                <textarea id="description" class="form-control border-radius-0"
+                                          placeholder="Raison de la dépense ..."></textarea>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-6 col-xl-6 col-sm-6 col-md-6 p-2">
+                            <a class="btn btn-primary" onclick="faireDepense('DEPENSE')" style="color: white; width: 100%"> Effecter</a>
+                        </div>
+
+                        <div class="col-lg-6 col-xl-6 col-sm-6 col-md-6 p-2">
+                            <a class="btn btn-primary" onclick=" document.getElementById('depenseModal').style.display = 'none'" style="color: white; width: 100% ">Annuler</a>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+</div>
+<!--POPUP EXTRAT JOURNEE-->
+<div id="extratModal" class="modal container-fluid ">
+    <div class="container" style="width:70%;float:right">
+        <div class="row">
+            <div class="card" style="width:70%">
+                <center> <p style="background-color: white" class="text-warning">Veuillez renseigner les champs</p></center>
+                <div class="card-body">
+                    <center> <p style="background-color: white; color: red" id="smsExtrat"></p></center>
+                    <center> <p style="background-color:white;color:green" id="messageExtrat"></p></center>
+                    <div class="row">
+                        <div class="col-lg-4 col-xl-4 col-sm-4 col-md-4">
+
+                        </div>
+                        <div class="col-lg-4 col-xl-4 col-sm-4 col-md-4">
+                            <div class="input-group input-group-outline">
+                                <label class="text text-center" style="width:100%">Montant</label>
+                                <input type="text" onkeypress="return isNumberKey2(this.id);" id="montantExtrat" name="montantExtrat" class="form-control" required>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-12 col-xl-12 col-sm-12 col-md-12">
+                            <div class="html-editor pd-20 card-box mb-30">
+                                <label class="text" style="width:100%;color:red">500 caractères au maximun</label>
+                                <textarea id="descriptionExtrat" class="form-control border-radius-0"
+                                          placeholder="Raison de la dépense ..."></textarea>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-6 col-xl-6 col-sm-6 col-md-6 p-2">
+                            <a class="btn btn-primary" onclick="faireDepense('EXTRAT')" style="color: white; width: 100%"> Effectuer</a>
+                        </div>
+
+                        <div class="col-lg-6 col-xl-6 col-sm-6 col-md-6 p-2">
+                            <a class="btn btn-primary" onclick=" document.getElementById('extratModal').style.display = 'none'" style="color: white; width: 100% ">Annuler</a>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+</div>
+<!--POPUP MODIFIER TRANSACTION-->
+<div id="modifierTransactionModal" class="modal container-fluid ">
+    <div class="container" style="width:70%;float:right">
+        <div class="row">
+            <div class="card" style="width:70%">
+                <center> <p style="background-color: white" class="text-success">Modification de transaction</p></center>
+                <div class="card-body">
+                    <center> <p style="background-color: white; color: red" id="smsModification"></p></center>
+                    <center> <p style="background-color:white;color:green" id="messageModification"></p></center>
+                    <div class="row">
+                        <div class="col-lg-4 col-xl-4 col-sm-4 col-md-4">
+                            <div class="input-group input-group-outline">
+                                <label class="text" style="width:100%">Opérateur</label>
+                                <select name="OperateurM" id="OperateurM" class="form-control" required>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-lg-4 col-xl-4 col-sm-4 col-md-4">
+                            <div class="input-group input-group-outline">
+                                <label class="text" style="width:100%">Opération</label>
+                                <select name="OperationM" onchange="chooseOperationM()" id="OperationM" class="form-control" required>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-lg-4 col-xl-4 col-sm-4 col-md-4">
+                            <div class="input-group input-group-outline">
+                                <label class="text" style="width:100%">Etat </label>
+                                <select name="EtatM" id="EtatM" class="form-control" required>
+                                    <option value="NONCREDIT" selected>NON CREDIT</option>
+                                    <option value="CREDIT">CREDIT</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-lg-4 col-xl-4 col-sm-4 col-md-4">
+                            <div class="input-group input-group-outline">
+                                <label class="text" style="width:100%">Téléphone</label>
+                                <input type="text" id="TelephoneM" name="TelephoneM" class="form-control" required>
+                            </div>
+                        </div>
+                        <div class="col-lg-4 col-xl-4 col-sm-4 col-md-4">
+                            <div class="input-group input-group-outline">
+                                <label class="text" style="width:100%">Montant</label>
+                                <input type="text" onkeypress="return isNumberKey2(this.id);" id="MontantM" name="MontantM" class="form-control" required>
+                            </div>
+                        </div>
+                        <div class="col-lg-4 col-xl-4 col-sm-4 col-md-4">
+                            <div class="input-group input-group-outline">
+                                <label class="text" style="width:100%">Frais</label>
+                                <input type="text" onkeypress="return isNumberKey2(this.id);" id="FraisM" name="FraisM" class="form-control">
+                            </div>
+                        </div>
+                        <div class="col-lg-4 col-xl-4 col-sm-4 col-md-4">
+                            <div class="input-group input-group-outline">
+                                <label class="text" style="width:100%">Commission</label>
+                                <input type="text" onkeypress="return isNumberKey2(this.id);" id="CommissionM" name="CommissionM" class="form-control">
+                            </div>
+                        </div>
+                        <div class="col-lg-4 col-xl-4 col-sm-4 col-md-4">
+                            <div class="input-group input-group-outline">
+                                <label class="text" style="width:100%">Surplux</label>
+                                <input type="text" onkeypress="return isNumberKey2(this.id);" id="SurpluxM" name="SurpluxM" class="form-control">
+                            </div>
+                        </div>
+                        <div class="col-lg-4 col-xl-4 col-sm-4 col-md-4">
+                            <div class="input-group input-group-outline">
+                                <label class="text" style="width:100%">Taxe</label>
+                                <input type="text" onkeypress="return isNumberKey2(this.id);" id="TaxeM" name="TaxeM" class="form-control">
+                            </div>
+                        </div>
+                    </div> 
+                    <input type="text" id="sensM" name="sensM" class="form-control" hidden>
+                    <input type="text" id="transactionID" name="transactionID" class="form-control" hidden>
+
+                    <div class="row">
+                        <div class="col-lg-12 col-xl-12 col-sm-12 col-md-12">
+                            <div class="pd-20 card-box">
+                                <label class="text" style="width:100%;color:red">500 caractères au maximun</label>
+                                <textarea id="descriptionM" class="form-control border-radius-0"
+                                          placeholder="Raison de la dépense ..."></textarea>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <div class="row">
+                        <div class="col-lg-6 col-xl-6 col-sm-6 col-md-6 p-2">
+                            <a class="btn btn-primary" onclick="modifierTransaction()" style="color: white; width: 100%">Modifier</a>
+                        </div>
+
+                        <div class="col-lg-6 col-xl-6 col-sm-6 col-md-6 p-2">
+                            <a class="btn btn-primary" onclick=" document.getElementById('modifierTransactionModal').style.display = 'none'; window.location.reload()" style="color: white; width: 100% ">Annuler</a>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+</div>
+<!--JS DEBUTER JOURNEE-->
+<script type="text/javascript">
+    function isNumberKey2(evt) {
+        var charCode = (evt.which) ? evt.which : event.keyCode;
+        if (charCode != 46 && charCode > 31
+            && (charCode < 48 || charCode > 57))
+            return false;
+
+        return true;
+    }
+    function debuterJournerModal()
+    {
+        document.getElementById('debuterJournerModal').style.display = 'block'
+    }
+    function debuterJournee()
+    {
+        var operateurs = [];
+
+        var listes = @Html.Raw(Json.Encode(Model.operateurs));
+        listes.forEach(p => {
+            operateurs.push({
+                montant: $('#'+p.id).val(),
+                operateurID: p.id
+
+                })
+
+
+        })
+        var body = {
+            soldeDebuterJourneeDtoRequests: operateurs,
+            caisse: $('#Caisse').val()
+        }
+
+        document.getElementById("messageSoldeDebuterJournee").innerText = null
+        document.getElementById("smsSoldeDebuterJournee").innerText = null
+         $.post('@Url.Action("AjouterSoldeDebuterJournee")', body,
+            function (rep)
+            {
+                if (rep.code == 200)
+                {
+                    document.getElementById("messageSoldeDebuterJournee").innerText = rep.message;
+                    document.getElementById("smsSoldeDebuterJournee").innerText = null
+                    setTimeout(() => { document.getElementById('debuterJournerModal').style.display = 'none'; window.location.reload() }, 1000);
+                }
+                else
+                {
+                    document.getElementById("smsSoldeDebuterJournee").innerText = rep.message ;
+                    document.getElementById("messageSoldeDebuterJournee").innerText = null
+
+                }
+
+
+
+            }).fail(function (xhr, status, error) {
+                document.getElementById("smsSoldeDebuterJournee").innerText = " une erreur interne est survenue ";
+                document.getElementById("messageSoldeDebuterJournee").innerText = null
+
+            });
+
+
+
+
+    }
+
+
+</script>
+
+<!--JS CLOTURER JOURNEE-->
+<script type="text/javascript">
+    function isNumberKey2(evt) {
+        var charCode = (evt.which) ? evt.which : event.keyCode;
+        if (charCode != 46 && charCode > 31
+            && (charCode < 48 || charCode > 57))
+            return false;
+
+        return true;
+    }
+    function cloturerJourneeModal()
+    {
+        document.getElementById('cloturerJournerModal').style.display = 'block'
+    }
+    function cloturerJournee()
+    {
+        var ops = [];
+
+        var listes = @Html.Raw(Json.Encode(Model.operateurs));
+        listes.forEach(p => {
+            ops.push({
+                montant: $('#'+p.id+'-R').val(),
+                operateurID: p.id
+
+                })
+
+
+        })
+        var body = {
+            soldeCloturerJourneeDtoRequests: ops,
+            caisse: $('#CaisseC').val()
+        }
+
+        document.getElementById("messageSoldeCloturerJournee").innerText = null
+        document.getElementById("smsSoldeCloturerJournee").innerText = null
+         $.post('@Url.Action("AjouterSoldeCloturerJournee")', body,
+            function (rep)
+            {
+                if (rep.code == 200)
+                {
+                    document.getElementById("messageSoldeCloturerJournee").innerText = rep.message;
+                    document.getElementById("smsSoldeCloturerJournee").innerText = null
+                    setTimeout(() => { document.getElementById('cloturerJournerModal').style.display = 'none'; window.location.reload() }, 1000);
+                }
+                else
+                {
+                    document.getElementById("smsSoldeCloturerJournee").innerText = rep.message ;
+                    document.getElementById("messageSoldeCloturerJournee").innerText = null
+
+                }
+
+
+
+            }).fail(function (xhr, status, error) {
+                document.getElementById("smsSoldeCloturerJournee").innerText = " une erreur interne est survenue ";
+                document.getElementById("messageSoldeCloturerJournee").innerText = null
+
+            });
+
+
+
+
+    }
+
+
+</script>
+<!--JS DEPENSE-->
+<script type="text/javascript">
+    function extratModal() {
+        document.getElementById('extratModal').style.display = 'block'
+    }
+    function depenseModal()
+    {
+        document.getElementById('depenseModal').style.display = 'block'
+    }
+    function faireDepense(type)
+    {
+
+        var body = (type == "DEPENSE") ? { montant: $('#montant').val(), description: $('#description').val(), type: type }
+            : { montant: $('#montantExtrat').val(), description: $('#descriptionExtrat').val(), type: type }
+
+        document.getElementById("messageExtrat").innerText = null
+        document.getElementById("smsExtrat").innerText = null
+        document.getElementById("messageDepense").innerText = null
+        document.getElementById("smsDepense").innerText = null
+         $.post('@Url.Action("AjouterDepense_extrat")', body,
+            function (rep)
+            {
+                if (rep.code == 200)
+                {
+                    document.getElementById("messageDepense").innerText = rep.message;
+                    document.getElementById("smsDepense").innerText = null
+                    document.getElementById("messageExtrat").innerText = rep.message;
+                    document.getElementById("smsExtrat").innerText = null
+                    setTimeout(() => { document.getElementById('depenseModal').style.display = 'none'; window.location.reload() }, 1000);
+                }
+                else
+                {
+                    document.getElementById("smsExtrat").innerText = rep.message ;
+                    document.getElementById("messageExtrat").innerText = null
+                    document.getElementById("smsDepense").innerText = rep.message;
+                    document.getElementById("messageDepense").innerText = null
+
+                }
+
+
+
+            }).fail(function (xhr, status, error) {
+                document.getElementById("smsExtrat").innerText = " une erreur interne est survenue ";
+                document.getElementById("messageExtrat").innerText = null
+                document.getElementById("smsDepense").innerText = " une erreur interne est survenue ";
+                document.getElementById("messageDepense").innerText = null
+
+            });
+
+
+
+
+    }
+
+
+</script>
+
+<!--JS DEPOT-->
+<script type="text/javascript">
+    function isNumberKey2(evt) {
+        var charCode = (evt.which) ? evt.which : event.keyCode;
+        if (charCode != 46 && charCode > 31
+            && (charCode < 48 || charCode > 57))
+            return false;
+
+        return true;
+    }
+    function transactionDepotModal()
+    {
+        document.getElementById('transactionDepotModal').style.display = 'block'
+    }
+    function debuterJournee()
+    {
+        var operateurs = [];
+
+        var listes = @Html.Raw(Json.Encode(Model.operateurs));
+        listes.forEach(p => {
+            operateurs.push({
+                montant: $('#'+p.id).val(),
+                operateurID: p.id
+
+                })
+
+
+        })
+        var body = {
+            soldeDebuterJourneeDtoRequests: operateurs,
+            caisse: $('#Caisse').val()
+        }
+
+        document.getElementById("messageSoldeDebuterJournee").innerText = null
+        document.getElementById("smsSoldeDebuterJournee").innerText = null
+         $.post('@Url.Action("AjouterSoldeDebuterJournee")', body,
+            function (rep)
+            {
+                if (rep.code == 200)
+                {
+                    document.getElementById("messageSoldeDebuterJournee").innerText = rep.message;
+                    document.getElementById("smsSoldeDebuterJournee").innerText = null
+                    setTimeout(() => { document.getElementById('debuterJournerModal').style.display = 'none'; window.location.reload() }, 1000);
+                }
+                else
+                {
+                    document.getElementById("smsSoldeDebuterJournee").innerText = rep.message ;
+                    document.getElementById("messageSoldeDebuterJournee").innerText = null
+
+                }
+
+
+
+            }).fail(function (xhr, status, error) {
+                document.getElementById("smsSoldeDebuterJournee").innerText = " une erreur interne est survenue ";
+                document.getElementById("messageSoldeDebuterJournee").innerText = null
+
+            });
+
+
+
+
+    }
+    function chooseOperation()
+    {
+        var listes = @Html.Raw(Json.Encode(Model.operations));
+        var operation = listes.filter(p => p.id == $('#Operation').val())[0]
+        $('#sens').val(operation.sens)
+
+    }
+    function faireDepot()
+    {
+
+        var body = {
+            Montant: $('#Montant').val(),
+            Taxe: $('#Taxe').val(),
+            Commission: $('#Commission').val(),
+            Frais: $('#Frais').val(),
+            Telephone: $('#Telephone').val(),
+            Operateur: $('#Operateur').val(),
+            Operation: $('#Operation').val(),
+            Surplux: $('#Surplux').val(),
+            Sens: $('#sens').val(),
+            Etat: $('#Etat').val()
+        }
+
+
+
+        document.getElementById("messageDepot").innerText = null
+        document.getElementById("smsDepot").innerText = null
+         $.post('@Url.Action("FaireTransaction")', body,
+            function (rep)
+            {
+                if (rep.code == 200)
+                {
+                    document.getElementById("messageDepot").innerText = rep.message;
+                    document.getElementById("smsDepot").innerText = null
+                    setTimeout(() => { document.getElementById('transactionDepotModal').style.display = 'none'; window.location.reload() }, 1000);
+                }
+                else
+                {
+                    document.getElementById("smsDepot").innerText = rep.message ;
+                    document.getElementById("messageDepot").innerText = null
+
+                }
+
+
+
+            }).fail(function (xhr, status, error) {
+                document.getElementById("smsDepot").innerText = " une erreur interne est survenue";
+                document.getElementById("messageDepot").innerText = null
+
+            });
+
+
+
+
+    }
+</script>
+
+
+<!--JS MODIFER TRANSACTION-->
+<script type="text/javascript">
+
+    function modifierTransactionDepotModal(id)
+    {
+        var transactions = @Html.Raw(Json.Encode(Model.transactions));
+        var operateurs = @Html.Raw(Json.Encode(Model.operateurs));
+        var operations = @Html.Raw(Json.Encode(Model.operations));
+
+        
+
+        var transaction = transactions.filter(e => e.id == id)[0];
+
+            document.getElementById('MontantM').value = transaction.montant,
+            document.getElementById('TaxeM').value = transaction.taxe,
+            document.getElementById('CommissionM').value = transaction.commission,
+            document.getElementById('FraisM').value = transaction.frais,
+            document.getElementById('TelephoneM').value = transaction.numero,
+            document.getElementById('descriptionM').value = transaction.description,
+            document.getElementById('SurpluxM').value = transaction.surplux,
+            document.getElementById('sensM').value = transaction.sens,
+            document.getElementById('EtatM').value = transaction.etat,
+            document.getElementById('transactionID').value = id
+            $("#OperateurM").empty()
+            $("#OperationM").empty()
+
+        operateurs.forEach(p =>
+        {
+            if (transaction.operateurID == p.id)
+            {
+                $("#OperateurM").append('<option value="' + p.id + '" selected>' + p.libelle + '</option>')
+
+            }
+            else
+            {
+                $("#OperateurM").append('<option value="' + p.id + '">' + p.libelle + '</option>')
+
+
+            }
+
+        })
+
+        operations.forEach(p =>
+        {
+            if (p.id == transaction.operationID)
+            {
+             $("#OperationM").append('<option value="' + p.id + '" selected>' + p.libelle + '</option>')
+
+            }
+            else
+            {
+               $("#OperationM").append('<option value="' + p.id + '">' + p.libelle + '</option>')
+
+
+            }
+
+        })
+
+        document.getElementById('modifierTransactionModal').style.display = 'block'
+    }
+   
+    function chooseOperationM()
+    {
+        var listes = @Html.Raw(Json.Encode(Model.operations));
+        var operation = listes.filter(p => p.id == $('#Operation').val())[0]
+        $('#sensM').val(operation.sens)
+
+    }
+
+    function modifierTransaction()
+    {
+
+        var body = {
+            Montant: $('#MontantM').val(),
+            Taxe: $('#TaxeM').val(),
+            Commission: $('#CommissionM').val(),
+            Frais: $('#FraisM').val(),
+            Telephone: $('#TelephoneM').val(),
+            Operateur: $('#OperateurM').val(),
+            Operation: $('#OperationM').val(),
+            Surplux: $('#SurpluxM').val(),
+            Sens: $('#sensM').val(),
+            Etat: $('#EtatM').val(),
+            description: $('#descriptionM').val(),
+            id: document.getElementById('transactionID').value
+
+        }
+
+
+
+        document.getElementById("messageModification").innerText = null
+        document.getElementById("smsModification").innerText = null
+         $.post('@Url.Action("FaireTransaction")', body,
+            function (rep)
+            {
+                if (rep.code == 200)
+                {
+                    document.getElementById("messageModification").innerText = rep.message;
+                    document.getElementById("smsModification").innerText = null
+                    setTimeout(() => { document.getElementById('modifierTransactionModal').style.display = 'none'; window.location.reload() }, 1000);
+                }
+                else
+                {
+                    document.getElementById("smsModification").innerText = rep.message ;
+                    document.getElementById("messageModification").innerText = null
+
+                }
+
+
+
+            }).fail(function (xhr, status, error) {
+                document.getElementById("smsModification").innerText = " une erreur interne est survenue";
+                document.getElementById("messageModification").innerText = null
+
+            });
+
+
+
+
+    }
+</script>
+<style>
+    .modal-header {
+        background: rgb(235,89,11);
+        background: linear-gradient(90deg, rgba(235,89,11,0.9640231092436975) 0%, rgba(253,175,29,1) 50%, rgba(255,255,255,1) 100%);
+    }
+
+    .inline {
+        max-width: 400px;
+        margin: auto;
+    }
+
+    .input-icons i {
+        position: absolute;
+    }
+
+    .input-icons {
+        width: 100%;
+        margin-bottom: 10px;
+    }
+
+    .icon {
+        padding: 10px;
+        min-width: 40px;
+        font-size: 24px;
+    }
+
+    .input-field {
+        width: 100%;
+        padding: 10px;
+        text-align: center;
+        margin-bottom: 3px;
+    }
+</style>

@@ -1,0 +1,696 @@
+﻿@model Tempon.StatistiqueData
+@{
+    ViewData["Title"] = "Liste transactions";
+    ViewData["UserName"] = Convert.ToString(Session["fullName"]);
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+@using Multitrans.Models
+@using PagedList.Mvc;
+
+<style>
+    table {
+        background: #f5f5f5;
+        border-collapse: separate;
+        box-shadow: inset 0 1px 0 #fff;
+        font-size: 12px;
+        line-height: 24px;
+        text-align: left;
+        width: 800px;
+    }
+
+    th, #total {
+        background-color: blue;
+        border-left: 1px solid black;
+        border-right: 1px solid black;
+        border-top: 1px solid black;
+        border-bottom: 1px solid black;
+        box-shadow: inset 0 1px 0 black;
+        color: black;
+        font-weight: bold;
+        padding: 10px 15px;
+        position: relative;
+        text-shadow: 0 1px 0 #000;
+    }
+
+        th:after {
+            background: linear-gradient(rgba(255,255,255,0), rgba(255,255,255,.08));
+            content: '';
+            display: block;
+            height: 25%;
+            left: 0;
+            margin: 1px 0 0 0;
+            position: absolute;
+            top: 25%;
+            width: 100%;
+        }
+
+        th:first-child {
+            border-left: 1px solid #777;
+            box-shadow: inset 1px 1px 0 black;
+        }
+
+        th:last-child {
+            box-shadow: inset -1px 1px 0 black;
+        }
+
+    td {
+        border-right: 1px solid #fff;
+        border-left: 1px solid #e8e8e8;
+        border-top: 1px solid #fff;
+        border-bottom: 1px solid #e8e8e8;
+        transition: all 300ms;
+    }
+
+        td:first-child {
+            box-shadow: inset 1px 0 0 #fff;
+        }
+
+        td:last-child {
+            border-right: 1px solid #e8e8e8;
+            box-shadow: inset -1px 0 0 #fff;
+        }
+
+    tr {
+    }
+
+        tr:nth-child(odd) td {
+            background: #f1f1f1;
+        }
+
+        tr:last-of-type td {
+            box-shadow: inset 0 -1px 0 #fff;
+        }
+
+            tr:last-of-type td:first-child {
+                box-shadow: inset 1px -1px 0 #fff;
+            }
+
+            tr:last-of-type td:last-child {
+                box-shadow: inset -1px -1px 0 #fff;
+            }
+
+
+
+
+
+    /* The Modal (background) */
+    .modal {
+        display: none; /* Hidden by default */
+        position: fixed; /* Stay in place */
+        padding-top: 100px; /* Location of the box */
+        left: 0;
+        top: 0;
+        width: 100%; /* Full width */
+        height: 100%; /* Full height */
+        overflow: auto; /* Enable scroll if needed */
+        background-color: rgb(0,0,0); /* Fallback color */
+        background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+    }
+
+    /* Modal Content */
+    .modal-content {
+        background-color: #fefefe;
+        margin: auto;
+        padding: 20px;
+        border: 1px solid #888;
+        width: 80%;
+    }
+
+    /* The Close Button */
+    .close {
+        color: #aaaaaa;
+        float: right;
+        font-size: 28px;
+        font-weight: bold;
+    }
+
+        .close:hover,
+        .close:focus {
+            color: #000;
+            text-decoration: none;
+            cursor: pointer;
+        }
+</style>
+<div class="main-container">
+    <div class="xs-pd-20-10 pd-ltr-20">
+
+        <div class="title pb-20">
+            <div class="page-header">
+                <div class="row">
+                    <div class="col-md-6 col-sm-12">
+                        <div class="title">
+                            <h4>Tableau de bord</h4>
+                        </div>
+                        <nav aria-label="breadcrumb" role="navigation">
+                            <ol class="breadcrumb">
+                                <li class="breadcrumb-item active" aria-current="page">Tableau de bord</li>
+                            </ol>
+                        </nav>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+
+
+        <div class="container-fluid py-4" style="margin-top:-40px">
+
+            <div class="row">
+
+                <div class="col-12">
+                    <div class="card my-4">
+                        <div class="card-header">
+                            <center class="text-primary" style="width:100%">Filtrage de la liste </center>
+                        </div>
+                        <div class="card-body ">
+                            @using (Html.BeginForm("ListeTransactions", "Admin", FormMethod.Get))
+                            {
+                                <div class="container">
+                                    <div class="row">
+                                        <div class="panel panel-primary">
+                                            <div class="panel-body">
+                                                <div class="row">
+                                                    <div class="col-sm-12 col-md-3 col-lg-3 col-xl-3  ">
+                                                        <div class="input-group input-group-outline mb-3">
+                                                            <label class="text" style="width:100%">Agence </label>
+                                                            <select name="agenceID" onchange="hideError()" id="agenceID" class="form-control">
+                                                                <option></option>
+                                                                @foreach (var operateur in Model.agences)
+                                                                {
+                                                                    if (operateur.id == Model.agenceID)
+                                                                    {
+                                                                        <option value="@operateur.id" selected>@operateur.nom</option>
+
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        <option value="@operateur.id">@operateur.nom</option>
+
+                                                                    }
+                                                                }
+                                                            </select>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-sm-12 col-md-3 col-lg-3 col-xl-3  ">
+                                                        <div class="input-group input-group-outline mb-3">
+                                                            <label class="text" style="width:100%">Caissier(e)</label>
+                                                            <select name="CaissierID" onchange="hideError()" id="CaissierID" class="form-control">
+                                                                <option></option>
+                                                                @foreach (var operateur in Model.users.Where(b => b.role == "C"))
+                                                                {
+
+
+
+                                                                    if (operateur.id == Model.caissierID)
+                                                                    {
+                                                                        <option value="@operateur.id" selected>@operateur.nom</option>
+
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        <option value="@operateur.id">@operateur.nom</option>
+
+                                                                    }
+                                                                }
+                                                            </select>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-sm-12 col-md-3 col-lg-3 col-xl-3  ">
+                                                        <div class="input-group input-group-outline mb-3">
+                                                            <label class="text" style="width:100%">Opérateur</label>
+                                                            <select name="operateurID" onchange="hideError()" id="operateurID" class="form-control">
+                                                                <option></option>
+                                                                @foreach (var operateur in Model.operateurs)
+                                                                {
+                                                                    if (operateur.id == Model.operateurID)
+                                                                    {
+                                                                        <option value="@operateur.id" selected>@operateur.libelle</option>
+
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        <option value="@operateur.id">@operateur.libelle</option>
+
+                                                                    }
+                                                                }
+                                                            </select>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-sm-12 col-md-3 col-lg-3 col-xl-3  ">
+                                                        <div class="input-group input-group-outline mb-3">
+                                                            <label class="text" style="width:100%">Opération</label>
+                                                            <select name="operationID" onchange="hideError()" id="operationID" class="form-control">
+                                                                <option></option>
+                                                                @foreach (var operateur in Model.operations)
+                                                                {
+                                                                    if (operateur.id == Model.operationID)
+                                                                    {
+                                                                        <option value="@operateur.id" selected>@operateur.libelle</option>
+
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        <option value="@operateur.id">@operateur.libelle</option>
+
+                                                                    }
+                                                                }
+                                                            </select>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-sm-12 col-md-3 col-lg-3 col-xl-3  ">
+                                                        <div class="input-group input-group-outline mb-3">
+                                                            <label class="text" style="width:100%">Etat</label>
+                                                            <select name="Etat" onchange="hideError()" id="Etat" class="form-control">
+                                                                <option></option>
+                                                                @if (Model.Etat == "CREDIT")
+                                                                {
+                                                                    <option selected>CREDIT</option>
+                                                                    <option>NONCREDIT</option>
+
+                                                                }
+                                                                else if (Model.Etat == "NONCREDIT")
+                                                                {
+                                                                    <option>CREDIT</option>
+                                                                    <option selected>NONCREDIT</option>
+                                                                }
+                                                                else
+                                                                {
+                                                                    <option>CREDIT</option>
+                                                                    <option>NONCREDIT</option>
+                                                                }
+
+
+                                                            </select>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="col-sm-12 col-md-3 col-lg-3 col-xl-3">
+                                                        <div class="input-group input-group-outline mb-3">
+                                                            <label class="text" style="width:100%">Date Debut</label>
+
+                                                            <input onchange="checkDateDebut()" id="DateDebutS" type="datetime-local" class="form-control">
+
+
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="col-sm-12 col-md-3 col-lg-3 col-xl-3">
+                                                        <div class="input-group input-group-outline mb-3">
+                                                            <label class="text" style="width:100%">Date Fin</label>
+
+
+                                                            <input onchange="checkFinDebut()" id="DateFinS" type="datetime-local" class="form-control">
+
+
+                                                        </div>
+                                                        <input name="DateDebut" id="DateDebut" value="@Model.DateFin" type="text" class="form-control" hidden>
+                                                        <input name="DateFin" id="DateFin" value="@Model.DateFin" type="text" class="form-control" hidden>
+
+
+                                                    </div>
+                                                    <div class="col-sm-12 col-md-3 col-lg-3 col-xl-3  ">
+                                                        <div class="input-group input-group-outline mb-3">
+                                                            <label class="text" style="width:100%">Taille</label>
+                                                            <select name="pageSize" id="pageSize" class="form-control">
+                                                                @if (Model.pageSize > 0)
+                                                                {
+                                                                    switch (Model.pageSize)
+                                                                    {
+                                                                        case 20:
+                                                                            <option>10</option>
+                                                                            <option selected>20</option>
+                                                                            <option>30</option>
+                                                                            <option>40</option>
+                                                                            <option>50</option>
+                                                                            break;
+                                                                        case 30:
+                                                                            <option value="10" selected></option>
+                                                                            <option>20</option>
+                                                                            <option selected>30</option>
+                                                                            <option>40</option>
+                                                                            <option>50</option>
+                                                                            break;
+                                                                        case 40:
+                                                                            <option>10</option>
+                                                                            <option>20</option>
+                                                                            <option>30</option>
+                                                                            <option selected>40</option>
+                                                                            <option>50</option>
+                                                                            break;
+                                                                        case 50:
+                                                                            <option>10</option>
+                                                                            <option>20</option>
+                                                                            <option>30</option>
+                                                                            <option>40</option>
+                                                                            <option selected>50</option>
+                                                                            break;
+                                                                        default:
+                                                                            <option selected>10</option>
+                                                                            <option>20</option>
+                                                                            <option>30</option>
+                                                                            <option>40</option>
+                                                                            <option>50</option>
+                                                                            break;
+                                                                    }
+                                                                }
+                                                                else
+                                                                {
+                                                                    <option selected>10</option>
+                                                                    <option>20</option>
+                                                                    <option>30</option>
+                                                                    <option>40</option>
+                                                                    <option>50</option>
+
+                                                                }
+
+
+                                                            </select>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-sm-12 col-md-3 col-lg-3 col-xl-3">
+
+                                                    </div>
+                                                    <div class="col-sm-12 col-md-3 col-lg-3 col-xl-3">
+
+                                                    </div>
+                                                    <div class="col-sm-12 col-md-3 col-lg-3 col-xl-3">
+                                                        <div class="input-group input-group-outline mb-3">
+                                                            <button class="btn btn-primary" id="btnRecherche" style="background-color:black"> Recherche</button>
+                                                        </div>
+                                                       
+                                                    </div>
+                                                    <div class="col-sm-12 col-md-3 col-lg-3 col-xl-3">
+                                                        
+                                                        <div class="input-group input-group-outline mb-3">
+                                                            <a class="btn btn-primary"  href="@Url.Action("ListeTransactions","Admin" )" style="background-color:black"> Initialiser</a>
+                                                        </div>
+                                                    </div>
+
+                                                </div>
+                                                <div class="row">
+                                                    <center> <h6 style="background-color:white;color:red" id="DateCompareMessage"></h6></center>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                            <div class="container">
+                                <div class="row">
+                                    <div class="panel panel-primary">
+                                        <div class="panel-body">
+                                            <div class="row">
+                                                <div class="col-sm-12 col-md-3 col-lg-3 col-xl-3  ">
+                                                    <div class="input-group input-group-outline mb-3">
+                                                        <button class="btn btn-primary" type="button" onclick="tableToCSV()">CSV</button>
+
+
+                                                    </div>
+                                                </div>
+                                                <div class="col-sm-12 col-md-3 col-lg-3 col-xl-3  ">
+                                                    <div class="input-group input-group-outline mb-3">
+                                                        <button class="btn btn-primary" type="button" onclick="ExportToExcel('xlsx')">EXCEL</button>
+                                                    </div>
+                                                </div>
+                                                <div class="col-sm-12 col-md-3 col-lg-3 col-xl-3  " style="margin-inline:9px">
+                                                    <div class="input-group input-group-outline mb-3">
+                                                        <button class="btn btn-primary" type="button" id="btPrint">PDF</button>
+
+                                                    </div>
+                                                </div>
+
+
+                                            </div>
+
+
+
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+
+                            <div class="table-responsive p-0">
+                                @if (Model.transactions.Count < 1)
+                                {
+                                    <center>
+                                        <h2>Aucune transaction  </h2>
+                                    </center>
+                                }
+                                else
+                                {
+                                    <table class="table align-items-center mb-0" id="tableID">
+                                        <thead>
+                                            <tr>
+                                                <th>Opérateur </th>
+                                                <th>Opération</th>
+                                                <th>Frais</th>
+                                                <th>Commission</th>
+                                                <th>Montant</th>
+                                                <th>Surplux</th>
+                                                <th>Etat</th>
+                                                <th>Téléphone</th>
+                                                <th>Date</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @foreach (var trans in Model.transactions)
+                                            {
+                                                <tr>
+                                                    <td class="table-plus">@Model.operateurs.Where(p => p.id == trans.operateurID).Select(z => z.libelle).FirstOrDefault()</td>
+                                                    <td>@Model.operations.Where(p => p.id == trans.operationID).Select(z => z.libelle).FirstOrDefault() </td>
+                                                    <td>@trans.frais </td>
+                                                    <td>@trans.commission </td>
+                                                    @{ var date = (new DateTime(1970, 1, 1)).AddMilliseconds(Convert.ToDouble(trans.date)); }
+                                                    <td>@trans.montant </td>
+                                                    <td>@trans.surplux </td>
+                                                    <td>@trans.etat </td>
+                                                    <td>@trans.numero </td>
+                                                    <td>@date </td>
+
+                                                </tr>
+
+                                            }
+                                        <tr id="total">
+                                            <td>Total</td>
+                                            <td> </td>
+                                            <td>@Model.transactions.Sum(p => p.frais) </td>
+                                            <td> @Model.transactions.Sum(p => p.commission)</td>
+
+                                            <td>@Model.transactions.Sum(p => p.montant) </td>
+                                            <td>@Model.transactions.Sum(p => p.surplux) </td>
+
+                                            <td> </td>
+                                            <td> </td>
+                                            <td> </td>
+
+                                        </tr>
+                                        </tbody>
+                                    </table>
+
+
+                                }
+                                <div class="container">
+                                    <div class="panel panel-primary">
+                                        <div class="panel-body">
+
+                                            <center>
+                                                <a class="btn btn-primary" href="@Url.Action("ListeTransactions","Admin" ,new { pageNo=(Convert.ToInt32(Model.pageNo - 1) < 1) ? 1 :Convert.ToInt32(Model.pageNo - 1)  ,pageSize=@Model.pageSize,agenceID=@Model.agenceID,caissierID=@Model.caissierID,operateurID=@Model.operateurID,operationID=@Model.operationID,Etat=@Model.Etat,sortBy=@Model.sortBy,DateDebut=@Model.DateDebut,DateFin=@Model.DateFin})">Précédent</a>
+                                                <span>@Model.pageNo </span>
+
+                                                <a class="btn btn-primary" href="@Url.Action("ListeTransactions","Admin" ,new { pageNo=(Convert.ToInt32(Model.pageNo) == 0) ? 2 :Convert.ToInt32(Model.pageNo + 1) ,pageSize=Model.pageSize,agenceID=Model.agenceID,caissierID=Model.caissierID,operateurID=Model.operateurID,operationID=Model.operationID,Etat=Model.Etat,sortBy=Model.sortBy,DateDebut=Model.DateDebut,DateFin=Model.DateFin})">Suivant</a>
+
+                                            </center>
+
+
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+<script type="text/javascript" src="https://unpkg.com/xlsx@0.15.1/dist/xlsx.full.min.js"></script>
+
+<script type="text/javascript">
+
+    function checkFinDebut() {
+
+        if (new Date(document.getElementById("DateFinS").value) >= new Date(document.getElementById("DateDebutS").value)) {
+            document.getElementById("btnRecherche").disabled = false
+            document.getElementById("DateCompareMessage").innerText = null
+
+
+        }
+        else {
+            document.getElementById("btnRecherche").disabled = true
+            document.getElementById("DateCompareMessage").innerText = "Veuillez choisir une date de début inférieure ou égale à la date de fin svp ";
+
+        }
+
+        document.getElementById("DateFin").value = new Date(document.getElementById("DateFinS").value).getTime()
+        document.getElementById("DateDebut").value = new Date(document.getElementById("DateDebutS").value).getTime()
+
+    }
+    function checkDateDebut() {
+
+        if (new Date(document.getElementById("DateFinS").value) >= new Date(document.getElementById("DateDebutS").value)) {
+            document.getElementById("btnRecherche").disabled = false
+            document.getElementById("DateCompareMessage").innerText = null;
+
+
+
+        }
+        else {
+            document.getElementById("btnRecherche").disabled = true
+            document.getElementById("DateCompareMessage").innerText = "Veuillez choisir une date de début inférieure ou égale à la date de fin svp ";
+
+
+        }
+        document.getElementById("DateFin").value = new Date(document.getElementById("DateFinS").value).getTime()
+        document.getElementById("DateDebut").value = new Date(document.getElementById("DateDebutS").value).getTime()
+
+    }
+
+
+</script>
+
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.22/pdfmake.min.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/0.4.1/html2canvas.min.js"></script>
+
+<script src="~/Scripts/jquery.csv.min.js"></script>
+<script type="text/javascript">
+    var localeDateTime = (new Date()).toLocaleString(); // "8/16/2021, 11:40:57 AM"
+
+
+    function tableToCSV() {
+
+        // Variable to store the final csv data
+        var csv_data = [];
+
+        // Get each row data
+        var rows = document.getElementsByTagName('tr');
+        for (var i = 0; i < rows.length; i++) {
+
+            // Get each column data
+            var cols = rows[i].querySelectorAll('td,th');
+
+            // Stores each csv row data
+            var csvrow = [];
+            for (var j = 0; j < cols.length; j++) {
+
+                // Get the text data of each cell
+                // of a row and push it to csvrow
+                csvrow.push(cols[j].innerHTML);
+            }
+
+            // Combine each column value with comma
+            csv_data.push(csvrow.join(","));
+        }
+
+        // Combine each row data with new line character
+        csv_data = csv_data.join('\n');
+
+        // Call this function to download csv file
+        downloadCSVFile(csv_data);
+
+    }
+
+    function downloadCSVFile(csv_data) {
+
+        // Create CSV file object and feed
+        // our csv_data into it
+        CSVFile = new Blob([csv_data], {
+            type: "text/csv"
+        });
+
+        // Create to temporary link to initiate
+        // download process
+        var temp_link = document.createElement('a');
+
+        // Download csv file
+        temp_link.download = localeDateTime + ".csv";
+        var url = window.URL.createObjectURL(CSVFile);
+        temp_link.href = url;
+
+        // This link should not be displayed
+        temp_link.style.display = "none";
+        document.body.appendChild(temp_link);
+
+        // Automatically click the link to
+        // trigger download
+        temp_link.click();
+        document.body.removeChild(temp_link);
+    }
+
+    function ExportToExcel(type, fn, dl) {
+        var elt = document.getElementById('tableID');
+        var wb = XLSX.utils.table_to_book(elt, { sheet: "sheet1" });
+        return dl ?
+            XLSX.write(wb, { bookType: type, bookSST: true, type: 'base64' }) :
+            XLSX.writeFile(wb, fn || (localeDateTime + '.' + (type || 'xlsx')));
+    }
+
+
+    $("body").on("click", "#btPrint", function () {
+        html2canvas($('#tableID')[0], {
+            onrendered: function (canvas) {
+                var data = canvas.toDataURL();
+                var allMembersDataInformation = {
+                    content: [{
+                        image: data,
+                        width: 500
+                    }]
+                };
+                pdfMake.createPdf(allMembersDataInformation).download(localeDateTime + ".pdf");
+            }
+        });
+    });
+
+
+
+</script>
+
+
+
+<script>
+
+    var today = new Date();
+    var dd = today.getDate();
+    var mm = today.getMonth() + 1; //January is 0!
+    var yyyy = today.getFullYear();
+    if (dd < 10) {
+        dd = '0' + dd;
+    }
+    if (mm < 10) {
+        mm = '0' + mm;
+    }
+
+    today = yyyy + '-' + mm + '-' + dd;
+    document.getElementById("DateFinS").setAttribute("max", today);
+    document.getElementById("DateDebutS").setAttribute("max", today);
+    var DateDebut = @Html.Raw(Json.Encode(Model.DateDebut));
+    var DateFin = @Html.Raw(Json.Encode(Model.DateFin));
+    
+
+    var debut = new Date(DateDebut);
+    var fin = new Date(DateFin);
+    debut.setMinutes(debut.getMinutes() - debut.getTimezoneOffset());
+    fin.setMinutes(fin.getMinutes() - fin.getTimezoneOffset());
+
+
+    document.getElementById('DateDebutS').value = (DateDebut != null)? debut.toISOString().slice(0, 16) : null;
+
+    document.getElementById('DateFinS').value = (DateFin != null) ? fin.toISOString().slice(0, 16) : null;
+
+
+
+
+</script>
+

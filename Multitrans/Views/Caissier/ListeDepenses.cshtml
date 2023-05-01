@@ -1,0 +1,190 @@
+﻿@model List<Depense_extrat>
+@{
+    ViewData["Title"] = "Listes dépenses";
+    ViewData["UserName"] = Convert.ToString(Session["fullName"]);
+    Layout = "~/Views/Shared/_CaissierLayout.cshtml";
+}
+@using Multitrans.Models
+<style>
+
+    /* The Modal (background) */
+    .modal {
+        display: none; /* Hidden by default */
+        position: fixed; /* Stay in place */
+        left: 0;
+        top: 0;
+        width: 100%; /* Full width */
+        height: 100%; /* Full height */
+        overflow: auto; /* Enable scroll if needed */
+        background-color: rgb(0,0,0); /* Fallback color */
+        background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+    }
+
+    /* Modal Content */
+    .modal-content {
+        background-color: #fefefe;
+        margin: auto;
+        border: 1px solid #888;
+        width: 80%;
+    }
+
+    /* The Close Button */
+    .close {
+        color: #aaaaaa;
+        float: right;
+        font-size: 28px;
+        font-weight: bold;
+    }
+
+        .close:hover,
+        .close:focus {
+            color: #000;
+            text-decoration: none;
+            cursor: pointer;
+        }
+</style>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+<div class="main-container">
+    <div class="xs-pd-20-10 pd-ltr-20">
+
+        <div class="title pb-20">
+            <div class="page-header">
+                <div class="row">
+                    <div class="col-md-6 col-sm-12">
+                        <div class="title">
+                            <h4>Tableau de bord</h4>
+                        </div>
+                        <nav aria-label="breadcrumb" role="navigation">
+                            <ol class="breadcrumb">
+                                <li class="breadcrumb-item active" aria-current="page">Tableau de bord</li>
+                            </ol>
+                        </nav>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <!-- Export Datatable start -->
+        <div class="card-box mb-30">
+            <div class="pb-20">
+
+                @if (Model.Count < 1)
+                {
+
+                    <center>
+                        <h2>Aucune dépense   </h2>
+                    </center>
+                }
+                else
+                {
+                    <table class="table hover multiple-select-row data-table-export nowrap">
+                        <thead>
+                            <tr>
+                                <th>Montant </th>
+                                <th>Date</th>
+
+                            </tr>
+                        </thead>
+                        <tbody>
+
+                            @foreach (var trans in Model)
+                            {
+                                <tr>
+                                    @{ var date = (new DateTime(1970, 1, 1)).AddMilliseconds(Convert.ToDouble(trans.date)); }
+                                    <td>@trans.montant </td>
+                                    <td>@date </td>
+                                    <td>
+                                        <div class="col-lg-6 col-xl-6 col-sm-6 col-md-6">
+                                            <a class="btn btn-primary" id="@trans.id" onclick="ouvrirRaison(this.id)" style="color: white; width: 100%"> Ouvrir</a>
+                                        </div>
+                                    </td>
+
+                                </tr>
+
+                            }
+
+
+
+                        </tbody>
+                    </table>
+
+                }
+            </div>
+        </div>
+        <!-- Export Datatable End -->
+    </div>
+</div>
+
+<div id="bloquageModal" class="modal container-fluid " style="padding:15%">
+    <div class="container-fluid" style="width: 50%;">
+        <div class="card">
+            <center> <p style="background-color: white; color: red">Description</p></center>
+            <div class="card-body">
+
+                <div class="row">
+                    <p id="raison"> </p>
+
+                </div>
+                <div class="row ">
+                    <div class="col-lg-4 col-xl-4 col-sm-4 col-md-4">
+                    </div>
+                    <div class="col-lg-4 col-xl-4 col-sm-4 col-md-4">
+                        <a class="btn btn-primary" onclick=" document.getElementById('bloquageModal').style.display = 'none'" style="color: white">Fermer</a>
+
+                    </div>
+                    <div class="col-lg-4 col-xl-4 col-sm-4 col-md-4">
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+</div>
+<script>
+
+    function ouvrirRaison(data)
+    {
+        var extrat =@Html.Raw(Json.Encode(Model));
+        var et = extrat.filter(e => e.id == data)[0].description;
+        document.getElementById('raison').innerText = et
+        document.getElementById('bloquageModal').style.display = 'block'
+
+    }
+</script>
+
+<style>
+    .modal-header {
+        background: rgb(235,89,11);
+        background: linear-gradient(90deg, rgba(235,89,11,0.9640231092436975) 0%, rgba(253,175,29,1) 50%, rgba(255,255,255,1) 100%);
+    }
+
+    .inline {
+        max-width: 400px;
+        margin: auto;
+    }
+
+    .input-icons i {
+        position: absolute;
+    }
+
+    .input-icons {
+        width: 100%;
+        margin-bottom: 10px;
+    }
+
+    .icon {
+        padding: 10px;
+        min-width: 40px;
+        font-size: 24px;
+    }
+
+    .input-field {
+        width: 100%;
+        padding: 10px;
+        text-align: center;
+        margin-bottom: 3px;
+    }
+</style>

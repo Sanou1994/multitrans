@@ -1,0 +1,220 @@
+﻿@{
+    var role =Convert.ToString(Session["role"]) ;
+    ViewBag.Title = "Modifier Profil";
+    Layout = null;
+
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <!-- Basic Page Info -->
+    <meta charset="utf-8">
+    <title>Multitrans</title>
+
+    <!-- Site favicon -->
+    <link rel="apple-touch-icon" sizes="180x180" href="~/vendors/images/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="~/vendors/images/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="~/vendors/images/favicon-16x16.png">
+
+    <!-- Mobile Specific Metas -->
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+    <!-- Google Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- CSS -->
+    <link rel="stylesheet" type="text/css" href="~/vendors/styles/core.css">
+    <link rel="stylesheet" type="text/css" href="~/vendors/styles/icon-font.min.css">
+    <link rel="stylesheet" type="text/css" href="~/vendors/styles/style.css">
+
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-119386393-1"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
+
+        gtag('config', 'UA-119386393-1');
+    </script>
+</head>
+<body class="login-page">
+    <div class="login-header box-shadow">
+        <div class="container-fluid d-flex justify-content-between align-items-center">
+            <div class="brand-logo">
+                <a href="login.html">
+                    <img src="~/vendors/images/deskapp-logo.svg" alt="">
+                </a>
+            </div>
+            <div class="login-menu">
+                <ul style="border-radius: 20px; background: #1b00ff;">
+                    <li><a href="~/Home/Dashboard" style="color: #fff;">&nbsp; S'inscrire &nbsp;</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class="login-wrap d-flex align-items-center flex-wrap justify-content-center">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-md-6 col-lg-7">
+                    <img src="~/vendors/images/login-page-img.png" alt="">
+                </div>
+                <div class="col-md-6 col-lg-5">
+
+                    <div class="card p-4" style="margin:10px">
+                        <div class="login-title">
+                            <h3 class="text-center text-primary">Modifier profil sur Multitrans</h3>
+                        </div>
+                        <center> <p style="background-color:white;color:red" id="smsM"></p></center>
+                        <center> <p style="background-color:white;color:green" id="messageM"></p></center>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-lg-12">
+                                    <div class="input-group input-group-outline ">
+                                        <label class="text" style="width:100%;color:black">Nom</label>
+                                        <input type="text" class="form-control" value="@ViewBag.Name" style="background-color:whitesmoke" name="NameM" id="NameM" required>
+                                    </div>
+                                </div>
+                                <div class="col-lg-12">
+                                    <div class="input-group input-group-outline ">
+                                        <label class="text" style="width:100%;color:black">Prénom</label>
+                                        <input type="text" class="form-control" value="@ViewBag.Surname" style="background-color:whitesmoke" name="SurnameM" id="SurnameM" required>
+                                    </div>
+
+                                </div>
+                                <div class="col-lg-12">
+                                    <div class="input-group input-group-outline ">
+                                        <label class="text" style="width:100%;color:black">Pseudo</label>
+                                        <input type="text" value="@ViewBag.pseudo" class="form-control" style="background-color:whitesmoke" name="PseudoM" id="PseudoM" required>
+                                    </div>
+
+                                </div>
+                                <div class="col-lg-12">
+                                    <div class="input-group input-group-outline ">
+                                        <label class="text" style="width:100%;color:black">Email</label>
+                                        <input type="text" value="@ViewBag.Email" class="form-control" style="background-color:whitesmoke" name="EmailM" id="EmailM" required>
+                                    </div>
+
+                                </div>
+
+                                <input type="text" class="form-control" value="@ViewBag.id" style="background-color:whitesmoke" id="compteIDM" name="compteIDM" hidden>
+
+
+                                <div class="col-lg-12">
+                                    <div class="input-group input-group-outline">
+                                        <label class="text" style="width:100%;color:black">Téléphone</label>
+                                        <input type="text" value="@ViewBag.Phone" class="form-control" onkeypress="return isNumberKey2(this.id);" style="background-color:whitesmoke" id="PhoneM" name="PhoneM">
+                                    </div>
+                                </div>
+
+                            </div>
+                            <center>
+                                @if (role == "MANAGER")
+                                {
+                                    <a class="btn btn-primary" href="~/Admin/Dashboard" style="color:white;float:left">Acceuil</a>
+
+                                }
+                                else if (role == "C")
+                                {
+                                    <a class="btn btn-primary"  href="~/Caissier/Dashboard" style="color:white;float:left">Acceuil</a>
+
+                                }
+                                else
+                                {
+                                    <a class="btn btn-primary" href="~/Superviseur/Dashboard" style="color:white;float:left">Acceuil</a>
+
+                                }
+
+                                <button class="btn btn-primary" onclick="modifierCompte()" style="color:white;float:right">Enregistrer</button>
+                            </center>
+
+                        </div>
+                    </div>
+
+
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- js -->
+    <script src="~/vendors/scripts/core.js"></script>
+    <script src="~/vendors/scripts/script.min.js"></script>
+    <script src="~/vendors/scripts/process.js"></script>
+    <script src="~/vendors/scripts/layout-settings.js"></script>
+    <script src="~/Scripts/jquery-3.4.1.min.js"></script>
+
+    <script>
+        function DispayPassword() {
+            var input = document.getElementById("Password");
+            if (input.type === "password") {
+                input.type = "text";
+            }
+            else {
+                input.type = "password";
+            }
+        }
+
+        function isNumberKey2(evt) {
+            var charCode = (evt.which) ? evt.which : event.keyCode;
+            if (charCode != 46 && charCode > 31
+                && (charCode < 48 || charCode > 57))
+                return false;
+
+            return true;
+        }
+    </script>
+</body>
+</html>
+
+
+
+
+<script>
+
+    function modifierCompte()
+    {
+        document.getElementById("smsM").innerText=null
+        document.getElementById("messageM").innerText = null
+
+
+
+        $.post('@Url.Action("profil")',
+            {
+                email: $('#EmailM').val(),
+                nom: $('#NameM').val(),
+                prenom: $('#SurnameM').val(),
+                pseudo: $('#PseudoM').val(),
+                agenceID: $('#AgenceM').val(),
+                role: $('#RoleM').val(),
+                telephone: $('#PhoneM').val(),
+                id: document.getElementById('compteIDM').value
+            },
+            function (reponse)
+            {
+
+                switch (reponse.code) {
+                    case 200:
+                        document.getElementById("smsM").innerText = null
+                        document.getElementById("messageM").innerText = reponse.message
+                        break;
+                    case 201:
+                        document.getElementById("messageM").innerText = null
+                        document.getElementById("smsM").innerText = reponse.sms
+                        break;
+                    default:
+                        document.getElementById("messageM").innerText = null
+                        document.getElementById("smsM").innerText = reponse.sms
+
+                }
+
+
+
+            }).fail(function (xhr, status, error) {
+                document.getElementById("smsM").innerText = " Une erreur interne  est survenue" 
+
+            });
+
+    }
+
+
+
+</script>

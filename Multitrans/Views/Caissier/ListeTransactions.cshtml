@@ -1,0 +1,203 @@
+﻿@model Tuple<List<Transaction>, List<Operation>, List<Operateur>>
+@{
+    ViewData["Title"] = "Liste transactions";
+    ViewData["UserName"] = Convert.ToString(Session["fullName"]);
+    Layout = "~/Views/Shared/_CaissierLayout.cshtml";
+}
+@using Multitrans.Models
+<style>
+
+    /* The Modal (background) */
+    .modal {
+        display: none; /* Hidden by default */
+        position: fixed; /* Stay in place */
+        left: 0;
+        top: 0;
+        width: 100%; /* Full width */
+        height: 100%; /* Full height */
+        overflow: auto; /* Enable scroll if needed */
+        background-color: rgb(0,0,0); /* Fallback color */
+        background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+    }
+
+    /* Modal Content */
+    .modal-content {
+        background-color: #fefefe;
+        margin: auto;
+        border: 1px solid #888;
+        width: 80%;
+    }
+
+    /* The Close Button */
+    .close {
+        color: #aaaaaa;
+        float: right;
+        font-size: 28px;
+        font-weight: bold;
+    }
+
+        .close:hover,
+        .close:focus {
+            color: #000;
+            text-decoration: none;
+            cursor: pointer;
+        }
+</style>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+<div class="main-container">
+    <div class="xs-pd-20-10 pd-ltr-20">
+
+        <div class="title pb-20">
+            <div class="page-header">
+                <div class="row">
+                    <div class="col-md-6 col-sm-12">
+                        <div class="title">
+                            <h4>Tableau de bord</h4>
+                        </div>
+                        <nav aria-label="breadcrumb" role="navigation">
+                            <ol class="breadcrumb">
+                                <li class="breadcrumb-item active" aria-current="page">Tableau de bord</li>
+                            </ol>
+                        </nav>
+                    </div>
+                   
+                </div>
+            </div>
+        </div>
+
+        <div class="row pb-10">
+            <div class="col-xl-4 col-lg-4 col-md-6 mb-20">
+                <div class="card-box height-100-p widget-style3">
+                    <div class="d-flex flex-wrap">
+                        <div class="widget-data">
+                            <div class="weight-700 font-24 text-dark">@Model.Item1.Count </div>
+                            <div class="font-14 text-secondary weight-500">Transactions</div>
+                        </div>
+                        <div class="widget-icon">
+                            <div class="icon" data-color="#ff5b5b"><span class="icon-copy ti-exchange-vertical"></span></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xl-4 col-lg-4 col-md-6 mb-20">
+                <div class="card-box height-100-p widget-style3">
+                    <div class="d-flex flex-wrap">
+                        <div class="widget-data">
+                            <div class="weight-700 font-24 text-dark">@Model.Item1.Where(o => o.sens == "ENCAISSEMENT").Count() </div>
+                            <div class="font-14 text-secondary weight-500">Encaissements</div>
+                        </div>
+                        <div class="widget-icon">
+                            <div class="icon" data-color="#ff5b5b"><span class="icon-copy ti-import"></span></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xl-4 col-lg-4 col-md-6 mb-20">
+                <div class="card-box height-100-p widget-style3">
+                    <div class="d-flex flex-wrap">
+                        <div class="widget-data">
+                            <div class="weight-700 font-24 text-dark">@Model.Item1.Where(o => o.sens == "DECAISSEMENT").Count() </div>
+                            <div class="font-14 text-secondary weight-500">Décaissement</div>
+                        </div>
+                        <div class="widget-icon">
+                            <div class="icon" data-color="#ff5b5b"><span class="icon-copy ti-export"></span></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+
+        <!-- Export Datatable start -->
+        <div class="card-box mb-30">
+            <div class="pb-20">
+
+                @if (Model.Item1.Count < 1)
+                {
+
+                    <center>
+                        <h2>Aucune transaction   </h2>
+                    </center>
+                }
+                else
+                {
+            <table  class="table hover multiple-select-row data-table-export nowrap">
+                <thead>
+                    <tr>
+                        <th>Opérateur </th>
+                        <th>Opération</th>
+                        <th>Frais</th>
+                        <th>Commission</th>
+                        <th>Montant</th>
+                        <th>Etat</th>
+                        <th>Téléphone</th>
+                        <th>Date</th>
+
+                    </tr>
+                </thead>
+                <tbody>
+
+                    @foreach (var trans in Model.Item1)
+                    {
+                        <tr>
+                            <td class="table-plus">@Model.Item3.Where(p => p.id == trans.operateurID).Select(z => z.libelle).FirstOrDefault()</td>
+                            <td>@Model.Item2.Where(p => p.id == trans.operationID).Select(z => z.libelle).FirstOrDefault() </td>
+                            <td>@trans.frais </td>
+                            <td>@trans.commission </td>
+                            @{ var date = (new DateTime(1970, 1, 1)).AddMilliseconds(Convert.ToDouble(trans.date)); }
+                            <td>@trans.montant </td>
+
+                            <td>@trans.etat </td>
+                            <td>@trans.numero </td>
+                            <td>@date</td>
+
+                        </tr>
+
+                    }
+
+                </tbody>
+                
+            </table>
+
+                }
+            </div>
+        </div>
+        <!-- Export Datatable End -->
+    </div>
+</div>
+
+
+<style>
+    .modal-header {
+        background: rgb(235,89,11);
+        background: linear-gradient(90deg, rgba(235,89,11,0.9640231092436975) 0%, rgba(253,175,29,1) 50%, rgba(255,255,255,1) 100%);
+    }
+
+    .inline {
+        max-width: 400px;
+        margin: auto;
+    }
+
+    .input-icons i {
+        position: absolute;
+    }
+
+    .input-icons {
+        width: 100%;
+        margin-bottom: 10px;
+    }
+
+    .icon {
+        padding: 10px;
+        min-width: 40px;
+        font-size: 24px;
+    }
+
+    .input-field {
+        width: 100%;
+        padding: 10px;
+        text-align: center;
+        margin-bottom: 3px;
+    }
+</style>

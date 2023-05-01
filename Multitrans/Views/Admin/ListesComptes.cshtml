@@ -1,0 +1,534 @@
+﻿@model  Tuple<List<User>, List<Agence>>
+@{ ViewBag.Title = "Liste de Comptes";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    ViewData["UserName"] = Convert.ToString(Session["fullName"]);
+}
+@using Multitrans.Models;
+<style>
+
+    /* The Modal (background) */
+    .modal {
+        display: none; /* Hidden by default */
+        position: fixed; /* Stay in place */
+        padding-top: 20px; /* Location of the box */
+        left: 0;
+        top: 0;
+        width: 100%; /* Full width */
+        height: 100%; /* Full height */
+        overflow: auto; /* Enable scroll if needed */
+        background-color: rgb(0,0,0); /* Fallback color */
+        background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+    }
+
+    /* Modal Content */
+    .modal-content {
+        background-color: #fefefe;
+        margin: auto;
+        padding: 20px;
+        border: 1px solid #888;
+        width: 80%;
+    }
+
+    /* The Close Button */
+    .close {
+        color: #aaaaaa;
+        float: right;
+        font-size: 28px;
+        font-weight: bold;
+    }
+
+        .close:hover,
+        .close:focus {
+            color: #000;
+            text-decoration: none;
+            cursor: pointer;
+        }
+</style>
+<div class="main-container">
+    <div class="xs-pd-20-10 pd-ltr-20">
+        <div class="min-height-200px">
+            <div class="page-header">
+                <div class="row">
+                    <div class="col-md-6 col-sm-12">
+                        <div class="title">
+                            <h4>Administration</h4>
+                        </div>
+                        <nav aria-label="breadcrumb" role="navigation">
+                            <ol class="breadcrumb">
+                                <li class="breadcrumb-item">
+                                    <a href="index.html">Acceuil</a>
+                                </li>
+                                <li class="breadcrumb-item active" aria-current="page">
+                                    Liste Comptes
+                                </li>
+                            </ol>
+                        </nav>
+                    </div>
+                    <div class="col-md-6 col-sm-12 text-right">
+                        <a class="btn btn-primary"
+                           style="color:white"
+                           onclick=" document.getElementById('ajouterCompte').style.display = 'block'">
+                            Ajouter Compte
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <center> <p style="background-color:white;color:red" id="smsM"></p></center>
+            <center> <p style="background-color:white;color:green" id="messageM"></p></center>
+            <!-- Export Datatable start -->
+            <div class="card-box mb-30">
+                <div class="pb-20">
+
+                    @if (Model.Item1.Count < 1)
+                    {
+
+                        <center>
+                            <h2>Aucun compte </h2>
+                        </center>
+                    }
+                    else
+                    {
+                        <table class="table hover multiple-select-row data-table-export nowrap">
+                            <thead>
+                                <tr>
+                                    <th>Nom </th>
+                                    <th>Prénom</th>
+                                    <th>Role</th>
+                                    <th>T&eacute;l&eacute;phone</th>
+                                    <th>Agence</th>
+                                    <th>Etat</th>
+                                    <th class="table-plus datatable-nosort">Actions</th>
+
+                                </tr>
+                            </thead>
+                            <tbody>
+
+                                @foreach (var patient in Model.Item1)
+                                {
+                                    var roleU = (patient.role == "C") ? "Caissier(e)" : "Superviseur";
+                                    var etat = (patient.status) ? "Activé" : "Désactivé";
+
+                                    <tr>
+                                        <td class="table-plus">@patient.nom</td>
+                                        <td>@patient.prenom</td>
+                                        <td>@roleU </td>
+                                        <td>@patient.telephone </td>
+                                        <td>@Model.Item2.Where(p => p.id == patient.agenceID).Select(s => s.nom).FirstOrDefault() </td>
+                                        <td>@etat </td>
+                                        <td>
+
+                                            <div class="dropdown">
+                                                <a class="btn btn-link font-24 p-0 line-height-1 no-arrow dropdown-toggle"
+                                                   href="#"
+                                                   role="button"
+                                                   data-toggle="dropdown">
+                                                    <i class="dw dw-more"></i>
+                                                </a>
+                                                <div class="dropdown-menu dropdown-menu-right dropdown-menu-icon-list">
+                                                    <button class="dropdown-item" onclick="ouvrirModifierPatientModal(@patient.id)"><i class="dw dw-edit2"></i> Modifier</button>
+                                                    @if (patient.status)
+                                                    {
+                                                        <button class="dropdown-item" onclick=" bloquageModal(@patient.id)"><i class="dw dw-lock"></i> Bloquer</button>
+
+                                                    }
+                                                    else
+                                                    {
+                                                        <button class="dropdown-item" onclick="bloquageModal(@patient.id)"><i class="dw dw-unlock"></i> Débloquer</button>
+
+                                                    }
+
+                                                </div>
+                                            </div>
+
+                                        </td>
+
+                                    </tr>
+
+                                }
+
+
+                            </tbody>
+                        </table>
+                    }
+
+                </div>
+            </div>
+            <!-- Export Datatable End -->
+        </div>
+
+
+
+    </div>
+</div>
+      
+<!--AJOUTER COMPTE -->
+<div id="ajouterCompte" class="modal container-fluid ">
+    <div class="container" style="width:70%;float:right">
+        <div class="row">
+            <div class="card" style="width:70%">
+                        <center> <p style="background-color:white;color:red" id="sms"></p></center>
+                        <center> <p style="background-color:white;color:green" id="message"></p></center>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-lg-6">
+                                    <div class="input-group input-group-outline ">
+                                        <label class="text" style="width:100%;color:black">Nom</label>
+                                        <input type="text" class="form-control" style="background-color:whitesmoke" name="Name" id="Name" required>
+                                    </div>
+                                </div>
+                                <div class="col-lg-6">
+                                    <div class="input-group input-group-outline ">
+                                        <label class="text" style="width:100%;color:black">Prénom</label>
+                                        <input type="text" class="form-control" style="background-color:whitesmoke" name="Surname" id="Surname" required>
+                                    </div>
+
+                                </div>
+                                <div class="col-lg-6">
+                                    <div class="input-group input-group-outline ">
+                                        <label class="text" style="width:100%;color:black">Pseudo</label>
+                                        <input type="text" class="form-control" style="background-color:whitesmoke" name="Pseudo" id="Pseudo" required>
+                                    </div>
+
+                                </div>
+                                <div class="col-lg-6">
+                                    <div class="input-group input-group-outline ">
+                                        <label class="text" style="width:100%;color:black">Email</label>
+                                        <input type="text" class="form-control" style="background-color:whitesmoke" name="Email" id="Email" required>
+                                    </div>
+
+                                </div>
+                                <div class="col-lg-6" style="width:100%">
+                                    <div class="input-group input-group-outline mb-3">
+                                        <label class="text" style="width:100%">Agence</label>
+                                        <select name="Agence" id="Agence" class="form-control" required>
+                                            <option value="0">Choisir une agence</option>
+                                            @foreach (var agence in Model.Item2)
+                                            {
+                                                <option value="@agence.id">@agence.nom</option>
+
+                                            }
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-lg-6" style="width:100%">
+                                    <label class="text" style="width:100%">Role</label>
+                                    <select name="Role" id="Role" class="form-control" required>
+                                        <option value="0" selected> Choisir un role</option>
+                                        <option value="C">Caissier(e)</option>
+                                        <option value="S">Superviseur</option>
+                                    </select>
+                                </div>
+
+
+                                <div class="col-lg-6">
+                                    <div class="input-group input-group-outline">
+                                        <label class="text" style="width:100%;color:black">Téléphone</label>
+                                        <input type="text" class="form-control" onkeypress="return isNumberKey2(this.id);" style="background-color:whitesmoke" id="Phone" name="Phone">
+                                    </div>
+                                </div>
+                                <div class="col-lg-6">
+                                    <div class="input-group input-group-outline">
+                                        <label class="text" style="width:100%;color:black">Mot de passe</label>
+                                        <input type="text" class="form-control" style="background-color:whitesmoke" id="Password" name="Password">
+                                    </div>
+                                </div>
+                            </div>
+                            <center>
+                                <button class="btn btn-primary" onclick="document.getElementById('ajouterCompte').style.display = 'none'" style="color:white;"> Fermer</button>
+
+                                <button class="btn btn-primary" onclick="enregistrerCompte()" style="color:white;float:right">Enregistrer</button>
+
+                            </center>
+
+                        </div>
+                    </div>
+                </div>
+            
+        </div>
+
+    </div>
+
+    <!--MODIFIER COMPTE -->
+    <div id="modifierCompte" class="modal container-fluid ">
+        <div class="container" style="width:70%;margin-inline:25%">
+            <div class="row">
+                <div class="col-12">
+                    <div class="card p-4" style="margin:10px">
+                        <center> <p style="background-color:white;color:red" id="smsM"></p></center>
+                        <center> <p style="background-color:white;color:green" id="messageM"></p></center>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-lg-6">
+                                    <div class="input-group input-group-outline ">
+                                        <label class="text" style="width:100%;color:black">Nom</label>
+                                        <input type="text" class="form-control" style="background-color:whitesmoke" name="NameM" id="NameM" required>
+                                    </div>
+                                </div>
+                                <div class="col-lg-6">
+                                    <div class="input-group input-group-outline ">
+                                        <label class="text" style="width:100%;color:black">Prénom</label>
+                                        <input type="text" class="form-control" style="background-color:whitesmoke" name="SurnameM" id="SurnameM" required>
+                                    </div>
+
+                                </div>
+                                <div class="col-lg-6">
+                                    <div class="input-group input-group-outline ">
+                                        <label class="text" style="width:100%;color:black">Pseudo</label>
+                                        <input type="text" class="form-control" style="background-color:whitesmoke" name="PseudoM" id="PseudoM" required>
+                                    </div>
+
+                                </div>
+                                <div class="col-lg-6">
+                                    <div class="input-group input-group-outline ">
+                                        <label class="text" style="width:100%;color:black">Email</label>
+                                        <input type="text" class="form-control" style="background-color:whitesmoke" name="EmailM" id="EmailM" required>
+                                    </div>
+
+                                </div>
+                                <div class="col-lg-4" style="width:100%">
+                                    <div class="input-group input-group-outline mb-3">
+                                        <label class="text" style="width:100%">Agence</label>
+                                        <select name="AgenceM" id="AgenceM" class="form-control" required>
+                                            @foreach (var agence in Model.Item2)
+                                            {
+                                                <option value="@agence.id">@agence.nom</option>
+
+                                            }
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-lg-4" style="width:100%">
+                                    <label class="text" style="width:100%">Role</label>
+                                    <select name="RoleM" id="RoleM" class="form-control" required>
+                                        <option value="C">Caissier(e)</option>
+                                        <option value="S">Superviseur</option>
+                                    </select>
+                                </div>
+                                <input type="text" class="form-control" style="background-color:whitesmoke" id="compteIDM" name="compteIDM" hidden>
+
+
+                                <div class="col-lg-4">
+                                    <div class="input-group input-group-outline">
+                                        <label class="text" style="width:100%;color:black">Téléphone</label>
+                                        <input type="text" class="form-control" onkeypress="return isNumberKey2(this.id);" style="background-color:whitesmoke" id="PhoneM" name="PhoneM">
+                                    </div>
+                                </div>
+
+                            </div>
+                            <center>
+                                <button class="btn btn-primary" onclick="document.getElementById('modifierCompte').style.display = 'none'" style="color:white;"> Fermer</button>
+
+                                <button class="btn btn-primary" onclick="modifierCompte()" style="color:white;float:right">Enregistrer</button>
+
+                            </center>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+
+    <div id="bloquageModal" class="modal container-fluid " style="padding:15%">
+        <div class="container-fluid" style="width: 50%;">
+            <div class="row" style="margin-bottom:50%">
+                <div class="card p-4">
+                    <center> <p style="background-color: white; color: red">Voulez-vous changer l'état de ce compte ?</p></center>
+                    <div class="card-body">
+
+                        <input type="text" class="form-control" id="compteID" name="compteID" hidden />
+                        <div class="row">
+                            <div class="col-lg-6 col-xl-6 col-sm-6 col-md-6">
+                                <a class="btn btn-primary" onclick="bloquage()" style="color: white; width: 100%"> Oui</a>
+                            </div>
+
+                            <div class="col-lg-6 col-xl-6 col-sm-6 col-md-6">
+                                <a class="btn btn-primary" onclick=" document.getElementById('bloquageModal').style.display = 'none'" style="color: white; width: 100% ">Non</a>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+    </div>
+
+
+    <script src="~/Scripts/jquery-3.4.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/dayjs/1.8.16/dayjs.min.js" crossorigin="anonymous"></script>
+
+    <script type="text/javascript">
+    function bloquageModal(id)
+    {
+        document.getElementById('bloquageModal').style.display = 'block'
+        document.getElementById('compteID').value = id;
+    }
+    function bloquage()
+    {
+
+
+        $.post('@Url.Action("desactiverCompte")', { No: document.getElementById('compteID').value},
+                             function (reponse)
+                             {
+
+                                window.location.reload()
+
+
+                            }).fail(function (xhr, status, error)
+                            {
+                                window.location.reload()
+
+                           });
+
+    }
+
+
+    </script>
+
+    <!-- SRIPT AJOUTER PATIENT-->
+    <script>
+        $('#Agence').select2();
+        $('#Role').select2();
+        $('#AgenceM').select2();
+        $('#RoleM').select2();
+
+        function isNumberKey2(evt) {
+            var charCode = (evt.which) ? evt.which : event.keyCode;
+            if (charCode != 46 && charCode > 31
+                && (charCode < 48 || charCode > 57))
+                return false;
+
+            return true;
+        }
+    </script>
+
+
+    <script type="text/javascript">
+
+    function enregistrerCompte()
+    {
+        document.getElementById("sms").innerText=null
+        document.getElementById("message").innerText = null
+
+        $.post('@Url.Action("AjouterCompte")',
+            {
+                pseudo: $('#Pseudo').val(),
+                nom: $('#Name').val(),
+                prenom: $('#Surname').val(),
+                agenceID: $('#Agence').val(),
+                role: $('#Role').val(),
+                password: $('#Password').val(),
+                email: $('#Email').val(),
+                telephone: $('#Phone').val()
+            },
+            function (reponse)
+            {
+
+                switch (reponse.code) {
+                    case 200:
+                        document.getElementById("sms").innerText = null
+                        document.getElementById("message").innerText = reponse.message
+                        setTimeout(() => { window.location.reload() }, 1000);
+                        break;
+                    case 201:
+                        document.getElementById("message").innerText = null
+                        document.getElementById("sms").innerText = reponse.message
+                        break;
+                    default:
+                        document.getElementById("message").innerText = null
+                        document.getElementById("sms").innerText = reponse.message
+
+                }
+
+
+
+            }).fail(function (xhr, status, error) {
+                document.getElementById("sms").innerText = " Une erreur interne est survenue"
+
+            });
+
+    }
+
+    </script>
+    <!-- SRIPT MODIFIER PATIENT-->
+
+    <script>
+    function ouvrirModifierPatientModal(patientID)
+    {
+
+             document.getElementById('modifierCompte').style.display = 'block'
+             document.getElementById('compteIDM').value = patientID;
+             var comptes = @Html.Raw(Json.Encode(Model.Item1));
+             var compte = comptes.filter(e => e.id == patientID)[0];
+
+                    $('#EmailM').val(compte.email),
+                    $('#NameM').val(compte.nom),
+                    $('#SurnameM').val(compte.prenom),
+                    $('#AgenceM').val(compte.agenceID),
+                    $('#RoleM').val(compte.role),
+                    $('#PseudoM').val(compte.pseudo),
+                    $('#PhoneM').val(compte.telephone)
+                // Recuper la date de naissance dans le champ
+
+
+
+
+         }
+
+
+
+    function modifierCompte()
+    {
+        document.getElementById("smsM").innerText=null
+        document.getElementById("messageM").innerText = null
+
+
+
+        $.post('@Url.Action("ajouterCompte")',
+            {
+                email: $('#EmailM').val(),
+                nom: $('#NameM').val(),
+                prenom: $('#SurnameM').val(),
+                pseudo: $('#PseudoM').val(),
+                agenceID: $('#AgenceM').val(),
+                role: $('#RoleM').val(),
+                telephone: $('#PhoneM').val(),
+                id: document.getElementById('compteIDM').value
+            },
+            function (reponse)
+            {
+
+                switch (reponse.code) {
+                    case 200:
+                        document.getElementById("smsM").innerText = null
+                        document.getElementById("messageM").innerText = reponse.message
+                        setTimeout(() => { window.location.reload() }, 1000);
+                        break;
+                    case 201:
+                        document.getElementById("messageM").innerText = null
+                        document.getElementById("smsM").innerText = reponse.message
+                        break;
+                    default:
+                        document.getElementById("messageM").innerText = null
+                        document.getElementById("smsM").innerText = reponse.message
+
+                }
+
+
+
+            }).fail(function (xhr, status, error) {
+                document.getElementById("smsM").innerText = " Une erreur interne est survenue"
+
+            });
+
+    }
+
+
+
+    </script>
+    <!--FIN MODIFIER-->

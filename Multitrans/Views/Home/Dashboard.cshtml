@@ -1,0 +1,321 @@
+﻿@{
+    ViewBag.Title = "Dashboard";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+<div class="main-container">
+    <div class="xs-pd-20-10 pd-ltr-20">
+
+        <div class="title pb-20">
+            <div class="page-header">
+                <div class="row">
+                    <div class="col-md-6 col-sm-12">
+                        <div class="title">
+                            <h4>Tableau de bord</h4>
+                        </div>
+                        <nav aria-label="breadcrumb" role="navigation">
+                            <ol class="breadcrumb">
+                                <li class="breadcrumb-item active" aria-current="page">Tableau de bord</li>
+                            </ol>
+                        </nav>
+                    </div>
+                    <div class="col-md-6 col-sm-12 text-right">
+                        <div class="dropdown">
+                            <a class="btn btn-primary dropdown-toggle" href="#" role="button" data-toggle="dropdown">
+                                Mars 2023
+                            </a>
+                            <div class="dropdown-menu dropdown-menu-right">
+                                <a class="dropdown-item" href="#">2022</a>
+                                <a class="dropdown-item" href="#">2021</a>
+                                <a class="dropdown-item" href="#">Nouvelle année</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row pb-10">
+            <div class="col-xl-3 col-lg-3 col-md-6 mb-20">
+                <div class="card-box height-100-p widget-style3">
+                    <div class="d-flex flex-wrap">
+                        <div class="widget-data">
+                            <div class="weight-700 font-24 text-dark">376</div>
+                            <div class="font-14 text-secondary weight-500">Transactions</div>
+                        </div>
+                        <div class="widget-icon">
+                            <div class="icon" data-color="#ff5b5b"><span class="icon-copy ti-exchange-vertical"></span></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xl-3 col-lg-3 col-md-6 mb-20">
+                <div class="card-box height-100-p widget-style3">
+                    <div class="d-flex flex-wrap">
+                        <div class="widget-data">
+                            <div class="weight-700 font-24 text-dark">200</div>
+                            <div class="font-14 text-secondary weight-500">Encaissements</div>
+                        </div>
+                        <div class="widget-icon">
+                            <div class="icon" data-color="#ff5b5b"><span class="icon-copy ti-import"></span></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xl-3 col-lg-3 col-md-6 mb-20">
+                <div class="card-box height-100-p widget-style3">
+                    <div class="d-flex flex-wrap">
+                        <div class="widget-data">
+                            <div class="weight-700 font-24 text-dark">176</div>
+                            <div class="font-14 text-secondary weight-500">Décaissement</div>
+                        </div>
+                        <div class="widget-icon">
+                            <div class="icon" data-color="#ff5b5b"><span class="icon-copy ti-export"></span></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xl-3 col-lg-3 col-md-6 mb-20">
+                <div class="card-box height-100-p widget-style3">
+                    <div class="d-flex flex-wrap">
+                        <div class="widget-data">
+                            <div class="weight-700 font-24 text-dark">5,000,000 XOF</div>
+                            <div class="font-14 text-secondary weight-500">Total</div>
+                        </div>
+                        <div class="widget-icon">
+                            <div class="icon" data-color="#09cc06"><i class="icon-copy fa fa-money" aria-hidden="true"></i></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row clearfix">
+            <div class="col-lg-3 col-md-6 col-sm-12 mb-30">
+                <div class="card card-box">
+                    <img class="card-img-top" src="~/vendors/images/img1.jpg" alt="Card image cap">
+                    <div class="card-body">
+                        <button type="button" class="btn btn-success" data-toggle="modal" data-target="#depot-orange-money-modal"><i class="fa fa-arrow-circle-down"></i> Dépôt</button>
+                        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#retrait-orange-money-modal"><i class="fa fa-arrow-circle-up"></i> Retrait</button>
+                        <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#cloturer-orange-money-modal"><i class="fa fa-times-circle"></i> Clôturer</button>
+                    </div>
+                </div>
+                <div class="col-md-4 col-sm-12 mb-30">
+                    <div class="pd-20 card-box height-100-p">
+                        <div class="modal fade bs-example-modal-lg" id="depot-orange-money-modal" tabindex="-1" role="dialog" aria-labelledby="DepotOrangeMoney" aria-hidden="true">
+                            <div class="modal-dialog modal-lg modal-dialog-centered">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h4 class="modal-title" id="DepotOrangeMoney">Faire un dépôt Orange Money</h4>
+                                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <div class="pd-20 card-box mb-30">
+                                            <div class="wizard-content">
+                                                <form class="tab-wizard wizard-circle wizard">
+                                                    <h5>Information</h5>
+                                                    <section>
+                                                        <div class="row">
+                                                            <div class="col-md-3"></div>
+                                                            <div class="col-md-6">
+                                                                <div class="form-group">
+                                                                    <label for="basic-url">Nom complet :</label>
+                                                                    <div class="input-group mb-3" style="border-radius:20px; border:1px solid;">
+                                                                        <span class="input-group-text"><i class="fa fa-user"></i></span>
+                                                                        <input type="text" class="form-control" style="border-radius:20px;" placeholder="Veuillez entrer le nom complet" />
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-md-3"></div>
+                                                        </div>
+                                                        <div class="row">
+                                                            <div class="col-md-3"></div>
+                                                            <div class="col-md-6">
+                                                                <div class="form-group">
+                                                                    <label for="basic-url">Numéro de téléphone :</label>
+                                                                    <div class="input-group mb-3" style="border-radius:20px; border:1px solid;">
+                                                                        <span class="input-group-text"><i class="fa fa-phone"></i></span>
+                                                                        <input type="text" class="form-control" style="border-radius:20px;" placeholder="Veuillez entrer le numéro de téléphone" />
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-md-3"></div>
+                                                        </div>
+                                                        <div class="row">
+                                                            <div class="col-md-3"></div>
+                                                            <div class="col-md-6">
+                                                                <div class="form-group">
+                                                                    <label for="basic-url">Montant :</label>
+                                                                    <div class="input-group mb-3" style="border-radius:20px; border:1px solid;">
+                                                                        <span class="input-group-text"><i class="fa fa-money"></i></span>
+                                                                        <input type="text" class="form-control" style="border-radius:20px;" placeholder="Veuillez entrer le montant" />
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-md-3"></div>
+                                                        </div>
+                                                    </section>
+                                                    <!-- Step 2 -->
+                                                    <h5>Récapitulatif</h5>
+                                                    <section>
+                                                        <div class="row">
+                                                            <div class="col-md-6">
+                                                                <div class="form-group">
+                                                                    <label>Job Title :</label>
+                                                                    <input type="text" class="form-control">
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-md-6">
+                                                                <div class="form-group">
+                                                                    <label>Company Name :</label>
+                                                                    <input type="text" class="form-control">
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-md-12">
+                                                                <div class="form-group">
+                                                                    <label>Job Description :</label>
+                                                                    <textarea class="form-control"></textarea>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </section>
+                                                    <!-- Step 3 -->
+                                                    <h5>Confirmation</h5>
+                                                    <section>
+                                                        <div class="row">
+                                                            <div class="col-md-6">
+                                                                <div class="form-group">
+                                                                    <label>Interview For :</label>
+                                                                    <input type="text" class="form-control">
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <label>Interview Type :</label>
+                                                                    <select class="form-control">
+                                                                        <option>Normal</option>
+                                                                        <option>Difficult</option>
+                                                                        <option>Hard</option>
+                                                                    </select>
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-md-6">
+                                                                <div class="form-group">
+                                                                    <label>Interview Date :</label>
+                                                                    <input type="text" class="form-control date-picker" placeholder="Select Date">
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <label>Interview Time :</label>
+                                                                    <input class="form-control time-picker" placeholder="Select time" type="text">
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </section>
+                                                    <!-- Step 4 -->
+                                                    @*<h5>Remark</h5>
+                                                        <section>
+                                                            <div class="row">
+                                                                <div class="col-md-6">
+                                                                    <div class="form-group">
+                                                                        <label>Behaviour :</label>
+                                                                        <input type="text" class="form-control">
+                                                                    </div>
+                                                                    <div class="form-group">
+                                                                        <label>Confidance</label>
+                                                                        <input type="text" class="form-control">
+                                                                    </div>
+                                                                    <div class="form-group">
+                                                                        <label>Result</label>
+                                                                        <select class="form-control">
+                                                                            <option>Select Result</option>
+                                                                            <option>Selected</option>
+                                                                            <option>Rejected</option>
+                                                                        </select>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-md-6">
+                                                                    <div class="form-group">
+                                                                        <label>Comments</label>
+                                                                        <textarea class="form-control"></textarea>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </section>*@
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class=" row justify-content-center modal-footer">
+                                        <button type="button" class="btn btn-success">Déposer</button>
+                                        <button type="button" class="btn btn-danger" data-dismiss="modal">Annuler</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-3 col-md-6 col-sm-12 mb-30">
+                <div class="card card-box">
+                    <img class="card-img-top" src="~/vendors/images/img2.jpg" alt="Card image cap">
+                    <div class="card-body">
+                        <a href="#" class="btn btn-primary">Faire une transaction</a>
+                        <a href="#" class="btn btn-danger">Clôturer</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-3 col-md-6 col-sm-12 mb-30">
+                <div class="card card-box">
+                    <img class="card-img-top" src="~/vendors/images/img3.jpg" alt="Card image cap">
+                    <div class="card-body">
+                        <a href="#" class="btn btn-primary">Faire une transaction</a>
+                        <a href="#" class="btn btn-danger">Clôturer</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-3 col-md-6 col-sm-12 mb-30">
+                <div class="card card-box">
+                    <img class="card-img-top" src="~/vendors/images/img4.jpg" alt="Card image cap">
+                    <div class="card-body">
+                        <a href="#" class="btn btn-primary">Faire une transaction</a>
+                        <a href="#" class="btn btn-danger">Clôturer</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<style>
+    .modal-header {
+        background: rgb(235,89,11);
+        background: linear-gradient(90deg, rgba(235,89,11,0.9640231092436975) 0%, rgba(253,175,29,1) 50%, rgba(255,255,255,1) 100%);
+    }
+
+    .inline {
+        max-width: 400px;
+        margin: auto;
+    }
+
+    .input-icons i {
+        position: absolute;
+    }
+
+    .input-icons {
+        width: 100%;
+        margin-bottom: 10px;
+    }
+
+    .icon {
+        padding: 10px;
+        min-width: 40px;
+        font-size: 24px;
+    }
+
+    .input-field {
+        width: 100%;
+        padding: 10px;
+        text-align: center;
+        margin-bottom: 3px;
+    }
+</style>
