@@ -148,6 +148,7 @@
     <Compile Include="App_Start\FilterConfig.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="App_Start\UnityConfig.cs" />
+    <Compile Include="Controllers\SuperviseurController.cs" />
     <Compile Include="Controllers\AdminController.cs" />
     <Compile Include="Controllers\CaissierController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
@@ -156,6 +157,7 @@
     </Compile>
     <Compile Include="Models\Depense_extrat.cs" />
     <Compile Include="Models\Depot_Retrait.cs" />
+    <Compile Include="Models\Tranche.cs" />
     <Compile Include="Models\SoldeReelItem.cs" />
     <Compile Include="Models\SoldeReel.cs" />
     <Compile Include="Models\Transaction.cs" />
@@ -842,6 +844,17 @@
     <Content Include="Views\Admin\SoldeDebuterJournees.cshtml" />
     <Content Include="Views\Admin\SoldeCloturerJournees.cshtml" />
     <Content Include="Views\Admin\ListeExtatDepenses.cshtml" />
+    <Content Include="Views\Superviseur\Dashboard.cshtml" />
+    <Content Include="Views\Superviseur\ListeExtatDepenses.cshtml" />
+    <Content Include="Views\Superviseur\ListesAgences.cshtml" />
+    <Content Include="Views\Superviseur\ListesComptes.cshtml" />
+    <Content Include="Views\Superviseur\ListesOperateurs.cshtml" />
+    <Content Include="Views\Superviseur\ListesOperations.cshtml" />
+    <Content Include="Views\Superviseur\ListeTransactions.cshtml" />
+    <Content Include="Views\Superviseur\SoldeCloturerJournees.cshtml" />
+    <Content Include="Views\Superviseur\SoldeDebuterJournees.cshtml" />
+    <Content Include="Views\Superviseur\Statistique.cshtml" />
+    <Content Include="Views\Shared\SuperviseurLayout.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

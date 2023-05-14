@@ -2,7 +2,7 @@
 @{
     ViewData["Title"] = "Dashboard Manager";
     ViewData["UserName"] = Convert.ToString(Session["fullName"]);
-    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    Layout = "~/Views/Shared/SuperviseurLayout.cshtml";
 }
 @using Multitrans.Models
 @using PagedList.Mvc;
@@ -178,34 +178,14 @@
                             <center class="text-primary" style="width:100%">Filtrage de la liste </center>
                         </div>
                         <div class="card-body ">
-                            @using (Html.BeginForm("Statistique", "Admin", FormMethod.Get))
+                            @using (Html.BeginForm("Statistique", "Superviseur", FormMethod.Get))
                             {
                                 <div class="container">
                                     <div class="row">
                                         <div class="panel panel-primary">
                                             <div class="panel-body">
                                                 <div class="row">
-                                                    <div class="col-sm-12 col-md-3 col-lg-3 col-xl-3  ">
-                                                        <div class="input-group input-group-outline mb-3">
-                                                            <label class="text" style="width:100%">Agence </label>
-                                                            <select name="agenceID" onchange="hideError()" id="agenceID" class="form-control">
-                                                                <option></option>
-                                                                @foreach (var operateur in Model.agences)
-                                                                {
-                                                                    if (operateur.id == Model.agenceID)
-                                                                    {
-                                                                        <option value="@operateur.id" selected>@operateur.nom</option>
 
-                                                                    }
-                                                                    else
-                                                                    {
-                                                                        <option value="@operateur.id">@operateur.nom</option>
-
-                                                                    }
-                                                                }
-                                                            </select>
-                                                        </div>
-                                                    </div>
                                                     <div class="col-sm-12 col-md-3 col-lg-3 col-xl-3  ">
                                                         <div class="input-group input-group-outline mb-3">
                                                             <label class="text" style="width:100%">Caissier(e)</label>
@@ -382,22 +362,28 @@
                                                             </select>
                                                         </div>
                                                     </div>
-                                                    <div class="col-sm-12 col-md-3 col-lg-3 col-xl-3">
 
-                                                    </div>
-                                                    <div class="col-sm-12 col-md-3 col-lg-3 col-xl-3">
-
-                                                    </div>
                                                     <div class="col-sm-12 col-md-3 col-lg-3 col-xl-3">
                                                         <div class="input-group input-group-outline mb-3">
+                                                            <label class="text text-white" style="width:100%">Taille</label>
+
                                                             <button class="btn btn-primary" id="btnRecherche" style="background-color:black"> Recherche</button>
                                                         </div>
 
                                                     </div>
                                                     <div class="col-sm-12 col-md-3 col-lg-3 col-xl-3">
 
+                                                    </div>
+                                                    <div class="col-sm-12 col-md-3 col-lg-3 col-xl-3">
+
+                                                    </div>
+                                                    <div class="col-sm-12 col-md-3 col-lg-3 col-xl-3">
+
+                                                    </div>
+                                                    <div class="col-sm-12 col-md-3 col-lg-3 col-xl-3">
+
                                                         <div class="input-group input-group-outline mb-3">
-                                                            <a class="btn btn-primary" href="@Url.Action("Statistique","Admin" )" style="background-color:black"> Initialiser</a>
+                                                            <a class="btn btn-primary" href="@Url.Action("Statistique","Superviseur" )" style="background-color:black"> Initialiser</a>
                                                         </div>
                                                     </div>
 
@@ -457,7 +443,6 @@
                                     <table class="table align-items-center mb-0" id="tableID">
                                         <thead>
                                             <tr>
-                                                <th>Agence </th>
                                                 <th>Caissier(e)</th>
                                                 <th>Frais/Commission</th>
                                                 <th>Encaissement</th>
@@ -475,8 +460,7 @@
                                             @foreach (var trans in Model.rapportDataList)
                                             {
                                                 <tr>
-                                                    <td class="table-plus">@Model.agences.Where(p => p.id == trans.agenceID).Select(z => z.nom).FirstOrDefault()</td>
-                                                    <td>@Model.users.Where(p => p.id == trans.caissierID).Select(z => z.prenom + " " + z.nom).FirstOrDefault() </td>
+                                                    <td class="table-plus">@Model.users.Where(p => p.id == trans.caissierID).Select(z => z.prenom + " " + z.nom).FirstOrDefault() </td>
                                                     <td>@trans.frais </td>
                                                     @{ var date = (new DateTime(1970, 1, 1)).AddMilliseconds(Convert.ToDouble(trans.Date)); }
                                                     <td>@trans.enc </td>
@@ -495,7 +479,6 @@
                                             }
                                             <tr id="total">
                                                 <td class="bg-primary">Total</td>
-                                                <td class="bg-primary"> </td>
                                                 <td class="bg-primary">@Model.rapportDataList.Sum(p => p.frais) </td>
                                                 <td class="bg-primary">@Model.rapportDataList.Sum(p => p.commission)</td>
                                                 <td class="bg-primary">@Model.rapportDataList.Sum(p => p.enc) </td>
@@ -504,7 +487,6 @@
                                                 <td class="bg-primary">@Model.rapportDataList.Sum(p => p.taxe) </td>
                                                 <td class="bg-primary">@Model.rapportDataList.Sum(p => p.depense) </td>
                                                 <td class="bg-primary">@Model.rapportDataList.Sum(p => p.extrat) </td>
-                                                <td class="bg-primary"> </td>
 
                                             </tr>
                                            
@@ -518,10 +500,10 @@
                                         <div class="panel-body">
 
                                             <center>
-                                                <a class="btn btn-primary" href="@Url.Action("Statistique","Admin" ,new { pageNo=(Convert.ToInt32(Model.pageNo - 1) < 1) ? 1 :Convert.ToInt32(Model.pageNo - 1)  ,pageSize=@Model.pageSize,agenceID=@Model.agenceID,caissierID=@Model.caissierID,operateurID=@Model.operateurID,operationID=@Model.operationID,Etat=@Model.Etat,sortBy=@Model.sortBy,DateDebut=@Model.DateDebut,DateFin=@Model.DateFin})">Précédent</a>
+                                                <a class="btn btn-primary" href="@Url.Action("Statistique","Superviseur" ,new { pageNo=(Convert.ToInt32(Model.pageNo - 1) < 1) ? 1 :Convert.ToInt32(Model.pageNo - 1)  ,pageSize=@Model.pageSize,agenceID=@Model.agenceID,caissierID=@Model.caissierID,operateurID=@Model.operateurID,operationID=@Model.operationID,Etat=@Model.Etat,sortBy=@Model.sortBy,DateDebut=@Model.DateDebut,DateFin=@Model.DateFin})">Précédent</a>
                                                 <span>@Model.pageNo </span>
 
-                                                <a class="btn btn-primary" href="@Url.Action("Statistique","Admin" ,new { pageNo=(Convert.ToInt32(Model.pageNo) == 0) ? 2 :Convert.ToInt32(Model.pageNo + 1) ,pageSize=Model.pageSize,agenceID=Model.agenceID,caissierID=Model.caissierID,operateurID=Model.operateurID,operationID=Model.operationID,Etat=Model.Etat,sortBy=Model.sortBy,DateDebut=Model.DateDebut,DateFin=Model.DateFin})">Suivant</a>
+                                                <a class="btn btn-primary" href="@Url.Action("Statistique","Superviseur" ,new { pageNo=(Convert.ToInt32(Model.pageNo) == 0) ? 2 :Convert.ToInt32(Model.pageNo + 1) ,pageSize=Model.pageSize,agenceID=Model.agenceID,caissierID=Model.caissierID,operateurID=Model.operateurID,operationID=Model.operationID,Etat=Model.Etat,sortBy=Model.sortBy,DateDebut=Model.DateDebut,DateFin=Model.DateFin})">Suivant</a>
 
                                             </center>
 

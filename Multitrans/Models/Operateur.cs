@@ -11,7 +11,7 @@ namespace Multitrans.Models
 		public long structureID { get; set; }
 		public string libelle { get; set; }
 		public bool status { get; set; }
-
+		public List<Tranche> tranches { get; set; }
 
 	}
 }

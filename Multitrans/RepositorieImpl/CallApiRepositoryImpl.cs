@@ -11,7 +11,9 @@ namespace Multitrans.Repositories
     {
 
         string urlBase = "http://158.69.120.240:8080";
-        public Reponse   CallBackendGet(string url, string tokenKey)
+		//string urlBase = "http://localhost:8080";
+
+		public Reponse   CallBackendGet(string url, string tokenKey)
         {
             Reponse reponse = new Reponse();
             string apiAddress = urlBase +url;

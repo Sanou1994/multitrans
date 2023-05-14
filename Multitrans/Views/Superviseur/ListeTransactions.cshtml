@@ -1,11 +1,13 @@
-﻿@model Tempon.RapportData
+﻿@model Tempon.StatistiqueData
 @{
-    ViewData["Title"] = "Dashboard Manager";
+    ViewData["Title"] = "Liste transactions";
     ViewData["UserName"] = Convert.ToString(Session["fullName"]);
-    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    var agenceID= Convert.ToString(Session["agenceID"]);
+    Layout = "~/Views/Shared/SuperviseurLayout.cshtml";
 }
 @using Multitrans.Models
 @using PagedList.Mvc;
+
 <style>
     table {
         background: #f5f5f5;
@@ -15,21 +17,6 @@
         line-height: 24px;
         text-align: left;
         width: 800px;
-    }
-
-
-    #benefice {
-        background-color: green;
-        border-left: 1px solid black;
-        border-right: 1px solid black;
-        border-top: 1px solid black;
-        border-bottom: 1px solid black;
-        box-shadow: inset 0 1px 0 black;
-        color: black;
-        font-weight: bold;
-        padding: 10px 15px;
-        position: relative;
-        text-shadow: 0 1px 0 #000;
     }
 
     th, #total {
@@ -178,34 +165,14 @@
                             <center class="text-primary" style="width:100%">Filtrage de la liste </center>
                         </div>
                         <div class="card-body ">
-                            @using (Html.BeginForm("Statistique", "Admin", FormMethod.Get))
+                            @using (Html.BeginForm("ListeTransactions", "Superviseur", FormMethod.Get))
                             {
                                 <div class="container">
                                     <div class="row">
                                         <div class="panel panel-primary">
                                             <div class="panel-body">
                                                 <div class="row">
-                                                    <div class="col-sm-12 col-md-3 col-lg-3 col-xl-3  ">
-                                                        <div class="input-group input-group-outline mb-3">
-                                                            <label class="text" style="width:100%">Agence </label>
-                                                            <select name="agenceID" onchange="hideError()" id="agenceID" class="form-control">
-                                                                <option></option>
-                                                                @foreach (var operateur in Model.agences)
-                                                                {
-                                                                    if (operateur.id == Model.agenceID)
-                                                                    {
-                                                                        <option value="@operateur.id" selected>@operateur.nom</option>
 
-                                                                    }
-                                                                    else
-                                                                    {
-                                                                        <option value="@operateur.id">@operateur.nom</option>
-
-                                                                    }
-                                                                }
-                                                            </select>
-                                                        </div>
-                                                    </div>
                                                     <div class="col-sm-12 col-md-3 col-lg-3 col-xl-3  ">
                                                         <div class="input-group input-group-outline mb-3">
                                                             <label class="text" style="width:100%">Caissier(e)</label>
@@ -218,7 +185,7 @@
 
                                                                     if (operateur.id == Model.caissierID)
                                                                     {
-                                                                        <option value="@operateur.id" selected>@operateur.prenom @operateur.nom </option>
+                                                                        <option value="@operateur.id" selected>@operateur.prenom @operateur.nom</option>
 
                                                                     }
                                                                     else
@@ -382,13 +349,9 @@
                                                             </select>
                                                         </div>
                                                     </div>
-                                                    <div class="col-sm-12 col-md-3 col-lg-3 col-xl-3">
 
-                                                    </div>
                                                     <div class="col-sm-12 col-md-3 col-lg-3 col-xl-3">
-
-                                                    </div>
-                                                    <div class="col-sm-12 col-md-3 col-lg-3 col-xl-3">
+                                                        <label class="text text-white" style="width:100%">#</label>
                                                         <div class="input-group input-group-outline mb-3">
                                                             <button class="btn btn-primary" id="btnRecherche" style="background-color:black"> Recherche</button>
                                                         </div>
@@ -396,8 +359,17 @@
                                                     </div>
                                                     <div class="col-sm-12 col-md-3 col-lg-3 col-xl-3">
 
+                                                    </div>
+                                                    <div class="col-sm-12 col-md-3 col-lg-3 col-xl-3">
+
+                                                    </div>
+                                                    <div class="col-sm-12 col-md-3 col-lg-3 col-xl-3">
+
+                                                    </div>
+                                                    <div class="col-sm-12 col-md-3 col-lg-3 col-xl-3">
+
                                                         <div class="input-group input-group-outline mb-3">
-                                                            <a class="btn btn-primary" href="@Url.Action("Statistique","Admin" )" style="background-color:black"> Initialiser</a>
+                                                            <a class="btn btn-primary" href="@Url.Action("ListeTransactions","Superviseur" )" style="background-color:black"> Initialiser</a>
                                                         </div>
                                                     </div>
 
@@ -446,7 +418,7 @@
 
 
                             <div class="table-responsive p-0">
-                                @if (Model.rapportDataList.Count < 1)
+                                @if (Model.transactions.Count < 1)
                                 {
                                     <center>
                                         <h2>Aucune transaction  </h2>
@@ -457,57 +429,45 @@
                                     <table class="table align-items-center mb-0" id="tableID">
                                         <thead>
                                             <tr>
-                                                <th>Agence </th>
-                                                <th>Caissier(e)</th>
+                                                <th>Opérateur </th>
+                                                <th>Opération</th>
                                                 <th>Frais/Commission</th>
-                                                <th>Encaissement</th>
-                                                <th>Décaissement</th>
+                                                <th>Montant</th>
                                                 <th>Surplux</th>
-                                                <th>Taxe</th>
-                                                <th>Dépense</th>
-                                                <th>Extrat</th>
+                                                <th>Etat</th>
+                                                <th>Téléphone</th>
                                                 <th>Date</th>
-                                                <th>Détails</th>
-
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            @foreach (var trans in Model.rapportDataList)
+                                            @foreach (var trans in Model.transactions)
                                             {
                                                 <tr>
-                                                    <td class="table-plus">@Model.agences.Where(p => p.id == trans.agenceID).Select(z => z.nom).FirstOrDefault()</td>
-                                                    <td>@Model.users.Where(p => p.id == trans.caissierID).Select(z => z.prenom + " " + z.nom).FirstOrDefault() </td>
+                                                    <td class="table-plus">@Model.operateurs.Where(p => p.id == trans.operateurID).Select(z => z.libelle).FirstOrDefault()</td>
+                                                    <td>@Model.operations.Where(p => p.id == trans.operationID).Select(z => z.libelle).FirstOrDefault() </td>
                                                     <td>@trans.frais </td>
-                                                    @{ var date = (new DateTime(1970, 1, 1)).AddMilliseconds(Convert.ToDouble(trans.Date)); }
-                                                    <td>@trans.enc </td>
-                                                    <td>@trans.dec </td>
+                                                    @{ var date = (new DateTime(1970, 1, 1)).AddMilliseconds(Convert.ToDouble(trans.date)); }
+                                                    <td>@trans.montant </td>
                                                     <td>@trans.surplux </td>
-                                                    <td>@trans.taxe </td>
-                                                    <td class="bg-danger">@trans.depense </td>
-                                                    <td>@trans.extrat </td>
+                                                    <td>@trans.etat </td>
+                                                    <td>@trans.numero </td>
                                                     <td>@date </td>
-                                                    <td>
-                                                        <button type="button" id="@trans.id" class="btn btn-outline-warning" onclick="Detail(this.id)">Voir</button>
 
-                                                    </td>
                                                 </tr>
 
                                             }
-                                            <tr id="total">
-                                                <td class="bg-primary">Total</td>
-                                                <td class="bg-primary"> </td>
-                                                <td class="bg-primary">@Model.rapportDataList.Sum(p => p.frais) </td>
-                                                <td class="bg-primary">@Model.rapportDataList.Sum(p => p.commission)</td>
-                                                <td class="bg-primary">@Model.rapportDataList.Sum(p => p.enc) </td>
-                                                <td class="bg-primary">@Model.rapportDataList.Sum(p => p.dec) </td>
-                                                <td class="bg-primary">@Model.rapportDataList.Sum(p => p.surplux) </td>
-                                                <td class="bg-primary">@Model.rapportDataList.Sum(p => p.taxe) </td>
-                                                <td class="bg-primary">@Model.rapportDataList.Sum(p => p.depense) </td>
-                                                <td class="bg-primary">@Model.rapportDataList.Sum(p => p.extrat) </td>
-                                                <td class="bg-primary"> </td>
+                                        <tr id="total">
+                                            <td>Total</td>
+                                            <td> </td>
+                                            <td>@Model.transactions.Sum(p => p.frais) </td>
 
-                                            </tr>
-                                           
+                                            <td>@Model.transactions.Sum(p => p.montant) </td>
+                                            <td>@Model.transactions.Sum(p => p.surplux) </td>
+
+                                            <td> </td>
+                                            <td> </td>
+
+                                        </tr>
                                         </tbody>
                                     </table>
 
@@ -518,10 +478,10 @@
                                         <div class="panel-body">
 
                                             <center>
-                                                <a class="btn btn-primary" href="@Url.Action("Statistique","Admin" ,new { pageNo=(Convert.ToInt32(Model.pageNo - 1) < 1) ? 1 :Convert.ToInt32(Model.pageNo - 1)  ,pageSize=@Model.pageSize,agenceID=@Model.agenceID,caissierID=@Model.caissierID,operateurID=@Model.operateurID,operationID=@Model.operationID,Etat=@Model.Etat,sortBy=@Model.sortBy,DateDebut=@Model.DateDebut,DateFin=@Model.DateFin})">Précédent</a>
+                                                <a class="btn btn-primary" href="@Url.Action("ListeTransactions","Superviseur" ,new { pageNo=(Convert.ToInt32(Model.pageNo - 1) < 1) ? 1 :Convert.ToInt32(Model.pageNo - 1)  ,pageSize=@Model.pageSize,agenceID=@Model.agenceID,caissierID=@Model.caissierID,operateurID=@Model.operateurID,operationID=@Model.operationID,Etat=@Model.Etat,sortBy=@Model.sortBy,DateDebut=@Model.DateDebut,DateFin=@Model.DateFin})">Précédent</a>
                                                 <span>@Model.pageNo </span>
 
-                                                <a class="btn btn-primary" href="@Url.Action("Statistique","Admin" ,new { pageNo=(Convert.ToInt32(Model.pageNo) == 0) ? 2 :Convert.ToInt32(Model.pageNo + 1) ,pageSize=Model.pageSize,agenceID=Model.agenceID,caissierID=Model.caissierID,operateurID=Model.operateurID,operationID=Model.operationID,Etat=Model.Etat,sortBy=Model.sortBy,DateDebut=Model.DateDebut,DateFin=Model.DateFin})">Suivant</a>
+                                                <a class="btn btn-primary" href="@Url.Action("ListeTransactions","Superviseur" ,new { pageNo=(Convert.ToInt32(Model.pageNo) == 0) ? 2 :Convert.ToInt32(Model.pageNo + 1) ,pageSize=Model.pageSize,agenceID=Model.agenceID,caissierID=Model.caissierID,operateurID=Model.operateurID,operationID=Model.operationID,Etat=Model.Etat,sortBy=Model.sortBy,DateDebut=Model.DateDebut,DateFin=Model.DateFin})">Suivant</a>
 
                                             </center>
 
@@ -537,55 +497,6 @@
 
         </div>
     </div>
-</div>
-
-<!--POPUP SOLDE REEL-->
-<div id="soldeReelModal" class="modal container-fluid ">
-    <div class="container" style="width:70%;float:right">
-        <div class="row">
-            <div class="card" style="width:70%">
-                <div class="card-body">
-                      <div class="row" >
-                        <table class="table table-responsive">
-                            <thead>
-                                <tr>
-                                    <th>Opérateur/ Caisse</th>
-                                    <th>Débuter Journée </th>
-                                    <th>Cloturer Journée</th>
-                                    <th>Solde Réels</th>
-                                    <th class="bg-danger">Somme Manquante</th>
-                                   
-                                </tr>
-                            </thead>
-                            <tbody id="detailsBody">                            
-                                
-
-                                
-
-
-
-                            </tbody>
-                        </table>
-
-
-                    </div>
-                    <div class="row">
-                        <div class="col-lg-4 col-xl-4 col-sm-4 col-md-4">
-
-                        </div>
-                        <div class="col-lg-4 col-xl-4 col-sm-4 col-md-4">
-                            <a class="btn btn-primary" onclick=" document.getElementById('soldeReelModal').style.display = 'none'" style="color: white; width: 100% ">Fermer </a>
-                        </div>
-                        <div class="col-lg-4 col-xl-4 col-sm-4 col-md-4">
-
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-
 </div>
 <script type="text/javascript" src="https://unpkg.com/xlsx@0.15.1/dist/xlsx.full.min.js"></script>
 
@@ -629,38 +540,7 @@
 
     }
 
-    function Detail(id)
-    {
-        var debuters = @Html.Raw(Json.Encode(Model.DebuterJourneeRapports));
-        var cloturers = @Html.Raw(Json.Encode(Model.CloturerJourneeRapports));
-        var operateurs = @Html.Raw(Json.Encode(Model.operateurs));
-        var reels = @Html.Raw(Json.Encode(Model.SoldeReelRapports));
 
-        var debuter = debuters.filter(e => e.id == id)[0];
-        var cloturer = cloturers.filter(e => e.soldeDebuterJourneeID == id)[0];
-        var reel = reels.filter(e => e.soldeDebuterJourneeID == id)[0];
-
-        if (cloturer != undefined)
-        {
-            $("#detailsBody").empty()
-            $("#detailsBody").append(`<tr><td> Caisse</td><td>${debuter.caisse}</td><td>${cloturer.caisse}</td><td>${reel.caisse}</td><td class="bg-danger">${debuter.caisse - cloturer.caisse}</td> </tr>`);
-            debuter.soldeDebuterJourneeItems.forEach(p => $("#detailsBody").append(`<tr><td> ${operateurs.filter(e => e.id == p.operateurID)[0].libelle}</td><td>${debuter.caisse}</td><td>${cloturer.caisse}</td><td>${reel.caisse}</td><td class="bg-danger">${debuter.caisse - cloturer.caisse}</td> </tr>`))
-            document.getElementById('soldeReelModal').style.display = 'block'
-
-        }
-        else {
-            $("#detailsBody").append(`<tr><td colspan="4" class="text-center">La journée n'est pas terminée</td><td></td></tr>`);
-
-            document.getElementById('soldeReelModal').style.display = 'block'
-
-
-        }
-
-
-
-       
-       
-    }
 </script>
 
 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.22/pdfmake.min.js"></script>
@@ -779,7 +659,7 @@
     document.getElementById("DateDebutS").setAttribute("max", today);
     var DateDebut = @Html.Raw(Json.Encode(Model.DateDebut));
     var DateFin = @Html.Raw(Json.Encode(Model.DateFin));
-
+    
 
     var debut = new Date(DateDebut);
     var fin = new Date(DateFin);
@@ -795,7 +675,4 @@
 
 
 </script>
-
-
-
 

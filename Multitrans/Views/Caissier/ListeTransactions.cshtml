@@ -127,8 +127,7 @@
                     <tr>
                         <th>Opérateur </th>
                         <th>Opération</th>
-                        <th>Frais</th>
-                        <th>Commission</th>
+                        <th>Frais/Commission</th>
                         <th>Montant</th>
                         <th>Etat</th>
                         <th>Téléphone</th>
@@ -144,7 +143,6 @@
                             <td class="table-plus">@Model.Item3.Where(p => p.id == trans.operateurID).Select(z => z.libelle).FirstOrDefault()</td>
                             <td>@Model.Item2.Where(p => p.id == trans.operationID).Select(z => z.libelle).FirstOrDefault() </td>
                             <td>@trans.frais </td>
-                            <td>@trans.commission </td>
                             @{ var date = (new DateTime(1970, 1, 1)).AddMilliseconds(Convert.ToDouble(trans.date)); }
                             <td>@trans.montant </td>
 

@@ -102,7 +102,7 @@
                         </thead>
                         <tbody>
 
-                            @foreach (var patient in Model)
+                            @foreach (var patient in Model.OrderByDescending(l => l.id))
                             {
                                 var etat = (patient.status) ? "Activé" : "Désactivé";
 
@@ -149,9 +149,9 @@
 </div>
 <!-- CREER OPERATION POPUP-->
 <div id="mediumModalCreate" class="modal container-fluid ">
-    <div class="container" style="width:70%;float:right">
+    <div class="container" style="width:80%;float:right">
         <div class="row">
-            <div class="card" style="width:70%">
+            <div class="card" style="width:80%">
 
                 <center> <p style="background-color: white; color: red" id="sms"></p></center>
                 <center> <p style="background-color:white;color:green" id="message"></p></center>
@@ -162,11 +162,39 @@
 
                         </div>
                     </div>
+                    <div class="row" id="tabCollection">
 
+                    </div>
+                    <div class="row">
+
+                        <div class="col-md-3 col-sm-12 col-12">
+                            <div class="form-group">
+                                <input id="trancheMin" onkeypress="return isNumberKey2(this.id);" name="trancheMin" type="text" class="form-control" placeholder="Tranche mininum" >
+
+                            </div>
+                        </div>
+                        <div class="col-md-3 col-sm-12 col-12">
+                            <div class="form-group">
+                                <input id="trancheMax" onkeypress="return isNumberKey2(this.id);" name="trancheMax" type="text" class="form-control" placeholder="Tranche maximum">
+
+                            </div>
+                        </div>
+
+                        <div class="col-md-3 col-sm-12 col-12">
+                            <div class="form-group">
+                                <input id="pourcentage" onkeypress="return isNumberKey2(this.id);" name="pourcentage" type="text" class="form-control" placeholder="Pourcentage">
+                            </div>
+                        </div>
+                        <div class="col-md-2 col-sm-12 col-12">
+                            <button type="button" onclick="ajouterItemCollection()" class="btn btn-primary">+</button>
+                            <button type="button" onclick="effacerItemCollection()" class="btn btn-primary">X</button>
+                        </div>
+
+                    </div>
                     <div class="row pt-1">
                         <div class="col-lg-12">
                             <button class="btn btn-primary" onclick="ajouterAgence()" style="float:right;"> Enregistrer</button>
-                            <button class="btn btn-primary" onclick=" document.getElementById('mediumModalCreate').style.display = 'none'" style="float:left;"> Fermer</button>
+                            <button class="btn btn-primary" onclick=" document.getElementById('mediumModalCreate').style.display = 'none'; window.location.reload()" style="float:left;"> Fermer</button>
                         </div>
                     </div>
                 </div>
@@ -181,36 +209,57 @@
 <!-- END CREER PERSONNEL POPUP-->
 <!-- MODIFIER PERSONNEL POPUP-->
 <div id="mediumModalModify" class="modal container-fluid ">
-
-    <div class="modal-dialog modal-lg" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="mediumModalLabelModify">Modifier opératieur</h5>
-
-            </div>
-            <div class="modal-body">
-                <div class="row">
-                    <div class="col-md-12">
-
-                        <center>
-                            <p id="messadeAjouterDepartementM" style="color: green"></p>
-                            <p id="smsAjouterDepartementM" style="color:red"></p>
-                        </center>
-
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label for="nom" class="control-label mb-1">Nom </label>
-                                    <input id="nomM" name="nomM" type="text" class="form-control">
-                                </div>
+    <div class="container" style="width:80%;float:right">
+        <div class="row">
+            <div class="card" style="width:80%">
+                <center>
+                    <p id="messadeAjouterDepartementM" style="color: green"></p>
+                    <p id="smsAjouterDepartementM" style="color:red"></p>
+                </center>
+                <div class="card-body">
+                    <div class="row pb-2">
+                        <div class="col-md-12 col-sm-12 text-center">
+                            <div class="form-group">
+                                <input id="nomM" name="nomM" type="text" placeholder="Nom" class="form-control">
                             </div>
                         </div>
                     </div>
+                    <div class="row" id="tabCollectionM">
+
+                    </div>
+                    <div class="row">
+
+                        <div class="col-md-3 col-sm-12 col-12">
+                            <div class="form-group">
+                                <input id="trancheMinM" onkeypress="return isNumberKey2(this.id);" name="trancheMinM" type="text" class="form-control" placeholder="Tranche mininum">
+
+                            </div>
+                        </div>
+                        <div class="col-md-3 col-sm-12 col-12">
+                            <div class="form-group">
+                                <input id="trancheMaxM" onkeypress="return isNumberKey2(this.id);" name="trancheMaxM" type="text" class="form-control" placeholder="Tranche maximum">
+
+                            </div>
+                        </div>
+
+                        <div class="col-md-3 col-sm-12 col-12">
+                            <div class="form-group">
+                                <input id="pourcentageM" onkeypress="return isNumberKey2(this.id);" name="pourcentageM" type="text" class="form-control" placeholder="Pourcentage">
+                            </div>
+                        </div>
+                        <div class="col-md-2 col-sm-12 col-12">
+                            <button type="button" onclick="ajouterItemCollectionM()" class="btn btn-primary">+</button>
+                            <button type="button" onclick="effacerItemCollectionM()" class="btn btn-primary">X</button>
+                        </div>
+
+                    </div>
+                    <div class="row pt-1">
+                        <div class="col-lg-12">
+                            <button class="btn btn-primary" onclick="modifierDepartement()" style="float:right;"> Enregistrer</button>
+                            <button class="btn btn-primary" onclick=" document.getElementById('mediumModalModify').style.display = 'none'; window.location.reload()" style="float:left;"> Fermer</button>
+                        </div>
+                    </div>
                 </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-primary" onclick="modifierDepartement()"><span id="spinnerM" class="spinner-border text-light" role="status" hidden></span>Enregistrer</button>
-                <button type="button" class="btn btn-danger" onclick="document.getElementById('mediumModalModify').style.display = 'none';window.location.reload()">Annuler</button>
             </div>
         </div>
     </div>
@@ -244,8 +293,20 @@
 
 </div>
 <!-- END MODIFIER PERSONNEL POPUP-->
-
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/typeahead.js/0.11.1/typeahead.bundle.min.js"></script>
+<script src="https://bootstrap-tagsinput.github.io/bootstrap-tagsinput/dist/bootstrap-tagsinput.min.js"></script>
 <script>
+    function isNumberKey2(evt) {
+        var charCode = (evt.which) ? evt.which : event.keyCode;
+        if (charCode != 46 && charCode > 31
+            && (charCode < 48 || charCode > 57))
+            return false;
+
+        return true;
+    }
+    var collection = new Array();
+    var collectionUpdate = new Array();
 
     function hideError() {
 
@@ -255,11 +316,18 @@
     }
     function ajouterAgence()
     {
+
+
+
         document.getElementById("message").innerText = null
         document.getElementById("sms").innerText = null
-         $.post('@Url.Action("AjouterOperateur")',
+        if (document.getElementById('Name').value.length != 0)
+        {
+            $.post('@Url.Action("AjouterOperateur")',
             {
-                libelle: document.getElementById('Name').value
+                libelle: document.getElementById('Name').value,
+                tranches: collection
+
 
             },
             function (rep)
@@ -285,34 +353,46 @@
 
             });
 
+        }
+        else
+        {
+          document.getElementById("sms").innerText = "veuillez saisir au moins le nom de l'opérateur";
+
+        }
+
+
+
+
+
+
 
 
     }
     function modifierDepartement()
     {
-        document.getElementById("spinnerM").hidden = false
         document.getElementById("messadeAjouterDepartementM").innerText = null
         document.getElementById("smsAjouterDepartementM").innerText = null
+        var collectionTempon = new Array();
+        collectionUpdate.filter(k => k != null).forEach(m => collectionTempon.push(m))
+
+
          $.post('@Url.Action("ajouterOperateur")',
             {
 
                 libelle: document.getElementById('nomM').value,
-
+                tranches: collectionTempon,
                 id: document.getElementById('departementID').value
-
             },
             function (rep)
             {
                 if (rep.code == 200)
                 {
-                    document.getElementById("spinnerM").hidden = true
                     document.getElementById("messadeAjouterDepartementM").innerText = rep.message;
                     document.getElementById("smsAjouterDepartementM").innerText = null
                     setTimeout(() => { document.getElementById('mediumModalModify').style.display = 'none'; window.location.reload() }, 1000);
                 }
                 else
                 {
-                    document.getElementById("spinnerM").hidden = true
                     document.getElementById("smsAjouterDepartementM").innerText = rep.message ;
                     document.getElementById("messadeAjouterDepartementM").innerText = null
 
@@ -321,7 +401,6 @@
 
 
             }).fail(function (xhr, status, error) {
-                document.getElementById("spinnerM").hidden = true
                 document.getElementById("smsAjouterDepartementM").innerText = " une erreur interne est survenue";
                 document.getElementById("messadeAjouterDepartementM").innerText = null
 
@@ -332,16 +411,43 @@
     }
     function ouvrirDepartementModal(departementID)
     {
+        collectionUpdate ==[]
         document.getElementById("messadeAjouterDepartementM").innerText = null
         document.getElementById("smsAjouterDepartementM").innerText = null
-
         var departements = @Html.Raw(Json.Encode(Model));
         var departement = departements.filter(e => e.id == departementID)[0];
+        departement.tranches.forEach(p => collectionUpdate.push({ id: p.id, montant_sup: p.montant_sup, montant_inf: p.montant_inf, pourcentage: p.pourcentage }) )
+        collectionUpdate.forEach((p,index) => {
+            $('#tabCollectionM').append(`
+                       <div class="col-md-3 col-sm-12 col-12" id="trancheMinItemM${index}">
+                           <div class="form-group">
+                                <input onkeypress="return isNumberKey2(this.id);"  value="${ p.montant_inf}"  type="text" class="form-control" placeholder="tranche min" readonly>
+                            </div>
+                        </div>
+                         <div class="col-md-3 col-sm-12 col-12" id="trancheMaxItemM${index}">
+                          <div class="form-group">
+                                <input onkeypress="return isNumberKey2(this.id);" value="${p.montant_sup}"  type="text" class="form-control" placeholder="tranche max" readonly>
+                            </div>
+                        </div>
+                       <div class="col-md-3 col-sm-12 col-12" id="pourcentageItemM${index}">
+                           <div class="form-group">
+                                <input onkeypress="return isNumberKey2(this.id);"  value="${p.pourcentage}"  type="text" class="form-control" placeholder="pourcentage" readonly>
+                            </div>
+                        </div>
+                         <div class="col-md-2" id="ItemEffacerCollectionM${index}">
+                            <button type="button" id="${index}"  onclick="effacerItemCollectionM(this.id)" class="btn btn-primary">X</button>
+                        </div>`);
+            
+        })
 
-        document.getElementById('departementID').value = departementID
+
+
+
+            document.getElementById('departementID').value = departementID
             document.getElementById('nomM').value = departement.libelle,
 
             document.getElementById('mediumModalModify').style.display = 'block'
+
 
 
 
@@ -388,6 +494,120 @@
 
             });
     }
+    function ajouterItemCollection()
+    {
+        var trancheMin = Number($("#trancheMin").val())
+        var trancheMax = Number($("#trancheMax").val())
+        var pourcentage = $("#pourcentage").val()
+        var resultat = trancheMin < trancheMax;
+        if (resultat ==true && pourcentage.length > 0) {
+            collection.push({ montant_sup: $("#trancheMax").val(), montant_inf: $("#trancheMin").val(), pourcentage: $("#pourcentage").val() })
 
 
+            var indxCurrentCollection = collection.length - 1
+
+            // Adding a row inside the tbody.
+            $('#tabCollection').append(`
+                       <div class="col-md-3 col-sm-12 col-12" id="trancheMinItem${indxCurrentCollection}">
+                           <div class="form-group">
+                                <input onkeypress="return isNumberKey2(this.id);"  value="${trancheMin}"  type="text" class="form-control" placeholder="tranche min" readonly>
+                            </div>
+                        </div>
+                         <div class="col-md-3 col-sm-12 col-12" id="trancheMaxItem${indxCurrentCollection}">
+                          <div class="form-group">
+                                <input onkeypress="return isNumberKey2(this.id);" value="${trancheMax}"  type="text" class="form-control" placeholder="tranche max" readonly>
+                            </div>
+                        </div>
+                       <div class="col-md-3 col-sm-12 col-12" id="pourcentageItem${indxCurrentCollection}">
+                           <div class="form-group">
+                                <input onkeypress="return isNumberKey2(this.id);"  value="${pourcentage}"  type="text" class="form-control" placeholder="pourcentage" readonly>
+                            </div>
+                        </div>
+                         <div class="col-md-2" id="ItemEffacerCollection${indxCurrentCollection}">
+                            <button type="button" id="${indxCurrentCollection}"  onclick="effacerItemCollection(this.id)" class="btn btn-primary">X</button>
+                        </div>`);
+
+            $("#trancheMin").val(null)
+            $("#trancheMax").val(null)
+            $("#pourcentage").val(null)
+        }
+        else
+        {
+            document.getElementById("sms").innerText = "veuillez saisir une tranche minimale inférieure à celle du maximun";
+
+        }
+
+
+
+
+
+    }
+
+    function effacerItemCollection(id) {
+        $('#trancheMinItem' + id).remove();
+        $('#trancheMaxItem' + id).remove();
+        $('#pourcentageItem' + id).remove();
+        $('#ItemEffacerCollection' + id).remove();
+        delete collection[id]
+
+    }
+    function ajouterItemCollectionM()
+    {
+        var trancheMin = Number($("#trancheMinM").val())
+        var trancheMax = Number($("#trancheMaxM").val())
+        var pourcentage = $("#pourcentageM").val()
+        var resultat = trancheMin < trancheMax;
+       
+
+        if (resultat == true && pourcentage.length > 0) {
+         collectionUpdate.push({ montant_sup: $("#trancheMaxM").val(), montant_inf: $("#trancheMinM").val(), pourcentage: $("#pourcentageM").val() })
+
+
+            var indxCurrentCollection = collectionUpdate.length - 1
+
+            // Adding a row inside the tbody.
+            $('#tabCollectionM').append(`
+                       <div class="col-md-3 col-sm-12 col-12" id="trancheMinItemM${indxCurrentCollection}">
+                           <div class="form-group">
+                                <input onkeypress="return isNumberKey2(this.id);"  value="${trancheMin}"  type="text" class="form-control" placeholder="tranche min" readonly>
+                            </div>
+                        </div>
+                         <div class="col-md-3 col-sm-12 col-12" id="trancheMaxItemM${indxCurrentCollection}">
+                          <div class="form-group">
+                                <input onkeypress="return isNumberKey2(this.id);" value="${trancheMax}"  type="text" class="form-control" placeholder="tranche max" readonly>
+                            </div>
+                        </div>
+                       <div class="col-md-3 col-sm-12 col-12" id="pourcentageItemM${indxCurrentCollection}">
+                           <div class="form-group">
+                                <input onkeypress="return isNumberKey2(this.id);"  value="${pourcentage}"  type="text" class="form-control" placeholder="pourcentage" readonly>
+                            </div>
+                        </div>
+                         <div class="col-md-2" id="ItemEffacerCollectionM${indxCurrentCollection}">
+                            <button type="button" id="${indxCurrentCollection}"  onclick="effacerItemCollectionM(this.id)" class="btn btn-primary">X</button>
+                        </div>`);
+
+            $("#trancheMinM").val(null)
+            $("#trancheMaxM").val(null)
+            $("#pourcentageM").val(null)
+
+        }
+        else {
+            document.getElementById("smsAjouterDepartementM").innerText = "veuillez saisir une tranche minimale inférieure à celle du maximun";
+
+        }
+
+
+
+
+
+    }
+
+    function effacerItemCollectionM(id) {
+        $('#trancheMinItemM' + id).remove();
+        $('#trancheMaxItemM' + id).remove();
+        $('#pourcentageItemM' + id).remove();
+        $('#ItemEffacerCollectionM' + id).remove();
+        delete collectionUpdate[id]
+
+    }
 </script>

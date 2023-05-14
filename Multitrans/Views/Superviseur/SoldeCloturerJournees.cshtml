@@ -1,8 +1,10 @@
-﻿@model Tempon.RapportData
+﻿@model Tempon.StatistiqueRapportData
 @{
     ViewData["Title"] = "Dashboard Manager";
     ViewData["UserName"] = Convert.ToString(Session["fullName"]);
-    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    Layout = "~/Views/Shared/SuperviseurLayout.cshtml";
+    var nb_operateur = Model.operateurs.Count();
+
 }
 @using Multitrans.Models
 @using PagedList.Mvc;
@@ -15,21 +17,6 @@
         line-height: 24px;
         text-align: left;
         width: 800px;
-    }
-
-
-    #benefice {
-        background-color: green;
-        border-left: 1px solid black;
-        border-right: 1px solid black;
-        border-top: 1px solid black;
-        border-bottom: 1px solid black;
-        box-shadow: inset 0 1px 0 black;
-        color: black;
-        font-weight: bold;
-        padding: 10px 15px;
-        position: relative;
-        text-shadow: 0 1px 0 #000;
     }
 
     th, #total {
@@ -145,19 +132,19 @@
             cursor: pointer;
         }
 </style>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
 <div class="main-container">
-    <div class="xs-pd-20-10 pd-ltr-20">
-
+    <div class="pd-ltr-20 xs-pd-20-10">
         <div class="title pb-20">
             <div class="page-header">
                 <div class="row">
                     <div class="col-md-6 col-sm-12">
                         <div class="title">
-                            <h4>Tableau de bord</h4>
+                            <h4>Tableau de bord Solde Cloturer Journées</h4>
                         </div>
                         <nav aria-label="breadcrumb" role="navigation">
                             <ol class="breadcrumb">
-                                <li class="breadcrumb-item active" aria-current="page">Tableau de bord</li>
+                                <li class="breadcrumb-item active" aria-current="page">Solde Cloturer Journées</li>
                             </ol>
                         </nav>
                     </div>
@@ -166,46 +153,26 @@
             </div>
         </div>
 
-
-
         <div class="container-fluid py-4" style="margin-top:-40px">
-
             <div class="row">
-
                 <div class="col-12">
                     <div class="card my-4">
                         <div class="card-header">
                             <center class="text-primary" style="width:100%">Filtrage de la liste </center>
                         </div>
+                        <center> <h4 style="background-color:white;color:red" id="smsB"></h4></center>
+                        <center> <h4 style="background-color:white;color:green" id="messageB"></h4></center>
+
                         <div class="card-body ">
-                            @using (Html.BeginForm("Statistique", "Admin", FormMethod.Get))
+
+                            @using (Html.BeginForm("SoldeCloturerJournees", "Superviseur", FormMethod.Get))
                             {
                                 <div class="container">
                                     <div class="row">
                                         <div class="panel panel-primary">
                                             <div class="panel-body">
                                                 <div class="row">
-                                                    <div class="col-sm-12 col-md-3 col-lg-3 col-xl-3  ">
-                                                        <div class="input-group input-group-outline mb-3">
-                                                            <label class="text" style="width:100%">Agence </label>
-                                                            <select name="agenceID" onchange="hideError()" id="agenceID" class="form-control">
-                                                                <option></option>
-                                                                @foreach (var operateur in Model.agences)
-                                                                {
-                                                                    if (operateur.id == Model.agenceID)
-                                                                    {
-                                                                        <option value="@operateur.id" selected>@operateur.nom</option>
 
-                                                                    }
-                                                                    else
-                                                                    {
-                                                                        <option value="@operateur.id">@operateur.nom</option>
-
-                                                                    }
-                                                                }
-                                                            </select>
-                                                        </div>
-                                                    </div>
                                                     <div class="col-sm-12 col-md-3 col-lg-3 col-xl-3  ">
                                                         <div class="input-group input-group-outline mb-3">
                                                             <label class="text" style="width:100%">Caissier(e)</label>
@@ -218,86 +185,20 @@
 
                                                                     if (operateur.id == Model.caissierID)
                                                                     {
-                                                                        <option value="@operateur.id" selected>@operateur.prenom @operateur.nom </option>
+                                                                        <option value="@operateur.id" selected>@operateur.prenom  @operateur.nom</option>
 
                                                                     }
                                                                     else
                                                                     {
-                                                                        <option value="@operateur.id">@operateur.prenom @operateur.nom</option>
+                                                                        <option value="@operateur.id">@operateur.prenom  @operateur.nom</option>
 
                                                                     }
                                                                 }
                                                             </select>
                                                         </div>
                                                     </div>
-                                                    <div class="col-sm-12 col-md-3 col-lg-3 col-xl-3  ">
-                                                        <div class="input-group input-group-outline mb-3">
-                                                            <label class="text" style="width:100%">Opérateur</label>
-                                                            <select name="operateurID" onchange="hideError()" id="operateurID" class="form-control">
-                                                                <option></option>
-                                                                @foreach (var operateur in Model.operateurs)
-                                                                {
-                                                                    if (operateur.id == Model.operateurID)
-                                                                    {
-                                                                        <option value="@operateur.id" selected>@operateur.libelle</option>
-
-                                                                    }
-                                                                    else
-                                                                    {
-                                                                        <option value="@operateur.id">@operateur.libelle</option>
-
-                                                                    }
-                                                                }
-                                                            </select>
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-sm-12 col-md-3 col-lg-3 col-xl-3  ">
-                                                        <div class="input-group input-group-outline mb-3">
-                                                            <label class="text" style="width:100%">Opération</label>
-                                                            <select name="operationID" onchange="hideError()" id="operationID" class="form-control">
-                                                                <option></option>
-                                                                @foreach (var operateur in Model.operations)
-                                                                {
-                                                                    if (operateur.id == Model.operationID)
-                                                                    {
-                                                                        <option value="@operateur.id" selected>@operateur.libelle</option>
-
-                                                                    }
-                                                                    else
-                                                                    {
-                                                                        <option value="@operateur.id">@operateur.libelle</option>
-
-                                                                    }
-                                                                }
-                                                            </select>
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-sm-12 col-md-3 col-lg-3 col-xl-3  ">
-                                                        <div class="input-group input-group-outline mb-3">
-                                                            <label class="text" style="width:100%">Etat</label>
-                                                            <select name="Etat" onchange="hideError()" id="Etat" class="form-control">
-                                                                <option></option>
-                                                                @if (Model.Etat == "CREDIT")
-                                                                {
-                                                                    <option selected>CREDIT</option>
-                                                                    <option>NONCREDIT</option>
-
-                                                                }
-                                                                else if (Model.Etat == "NONCREDIT")
-                                                                {
-                                                                    <option>CREDIT</option>
-                                                                    <option selected>NONCREDIT</option>
-                                                                }
-                                                                else
-                                                                {
-                                                                    <option>CREDIT</option>
-                                                                    <option>NONCREDIT</option>
-                                                                }
 
 
-                                                            </select>
-                                                        </div>
-                                                    </div>
 
                                                     <div class="col-sm-12 col-md-3 col-lg-3 col-xl-3">
                                                         <div class="input-group input-group-outline mb-3">
@@ -382,26 +283,28 @@
                                                             </select>
                                                         </div>
                                                     </div>
-                                                    <div class="col-sm-12 col-md-3 col-lg-3 col-xl-3">
+                                                    <div class="col-sm-12 col-md-3 col-lg-3 col-xl-3 ">
 
                                                     </div>
-                                                    <div class="col-sm-12 col-md-3 col-lg-3 col-xl-3">
+                                                    <div class="col-sm-12 col-md-3 col-lg-3 col-xl-3 ">
 
                                                     </div>
-                                                    <div class="col-sm-12 col-md-3 col-lg-3 col-xl-3">
+
+                                                    <div class="col-sm-12 col-md-3 col-lg-3 col-xl-3 ">
                                                         <div class="input-group input-group-outline mb-3">
                                                             <button class="btn btn-primary" id="btnRecherche" style="background-color:black"> Recherche</button>
                                                         </div>
-
                                                     </div>
                                                     <div class="col-sm-12 col-md-3 col-lg-3 col-xl-3">
-
                                                         <div class="input-group input-group-outline mb-3">
-                                                            <a class="btn btn-primary" href="@Url.Action("Statistique","Admin" )" style="background-color:black"> Initialiser</a>
+
+                                                            <a class="btn btn-primary" href="@Url.Action("SoldeCloturerJournees","Superviseur" )" style="background-color:black"> Initialiser</a>
                                                         </div>
                                                     </div>
 
+
                                                 </div>
+                                                
                                                 <div class="row">
                                                     <center> <h6 style="background-color:white;color:red" id="DateCompareMessage"></h6></center>
                                                 </div>
@@ -446,10 +349,11 @@
 
 
                             <div class="table-responsive p-0">
-                                @if (Model.rapportDataList.Count < 1)
+                                @if (Model.soldeCloturerJournees.Count < 1)
                                 {
+
                                     <center>
-                                        <h2>Aucune transaction  </h2>
+                                        <h2>Aucun solde cloturer journée disponible </h2>
                                     </center>
                                 }
                                 else
@@ -457,71 +361,90 @@
                                     <table class="table align-items-center mb-0" id="tableID">
                                         <thead>
                                             <tr>
-                                                <th>Agence </th>
+                                                <th>N° </th>
                                                 <th>Caissier(e)</th>
-                                                <th>Frais/Commission</th>
-                                                <th>Encaissement</th>
-                                                <th>Décaissement</th>
-                                                <th>Surplux</th>
-                                                <th>Taxe</th>
-                                                <th>Dépense</th>
-                                                <th>Extrat</th>
+                                                <th>Caisse</th>
+                                                @foreach (var patient in Model.operateurs)
+                                                {
+                                                    <th>@patient.libelle</th>
+
+                                                }
+                                                <th>Etat</th>
                                                 <th>Date</th>
-                                                <th>Détails</th>
+                                                <th class="table-plus datatable-nosort">Actions</th>
 
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            @foreach (var trans in Model.rapportDataList)
+
+                                            @foreach (var patient in Model.soldeCloturerJournees)
                                             {
+                                                var etat = (patient.status) ? "Activé" : "Désactivé";
+
                                                 <tr>
-                                                    <td class="table-plus">@Model.agences.Where(p => p.id == trans.agenceID).Select(z => z.nom).FirstOrDefault()</td>
-                                                    <td>@Model.users.Where(p => p.id == trans.caissierID).Select(z => z.prenom + " " + z.nom).FirstOrDefault() </td>
-                                                    <td>@trans.frais </td>
-                                                    @{ var date = (new DateTime(1970, 1, 1)).AddMilliseconds(Convert.ToDouble(trans.Date)); }
-                                                    <td>@trans.enc </td>
-                                                    <td>@trans.dec </td>
-                                                    <td>@trans.surplux </td>
-                                                    <td>@trans.taxe </td>
-                                                    <td class="bg-danger">@trans.depense </td>
-                                                    <td>@trans.extrat </td>
-                                                    <td>@date </td>
+                                                    <td class="table-plus">@patient.id</td>
+                                                    <td>@Model.users.Where(t => t.id == patient.idU).Select(k => k.prenom + " " + k.nom).FirstOrDefault()</td>
+                                                    <td>@patient.caisse</td>
+                                                    @{ var reste = nb_operateur - patient.soldeCloturerJourneeItems.Count();}
+
+                                                    @foreach (var item in patient.soldeCloturerJourneeItems)
+                                                    {
+                                                        if (item.montant != 0)
+                                                        {
+                                                            <td>@item.montant</td>
+
+                                                        }
+                                                        else
+                                                        {
+                                                            <td>0</td>
+
+                                                        }
+
+                                                    }
+                                                    @for (int i = 0; i < reste; i++)
+                                                    {
+
+                                                        <td>0</td>
+
+
+
+                                                    }
+                                                    @{ var date = (new DateTime(1970, 1, 1)).AddMilliseconds(Convert.ToDouble(patient.date)); }
+
+                                                    <td>@etat</td>
+                                                    <td>@date</td>
                                                     <td>
-                                                        <button type="button" id="@trans.id" class="btn btn-outline-warning" onclick="Detail(this.id)">Voir</button>
+                                                        <div class="dropdown">
+                                                            <a class="btn btn-link font-24 p-0 line-height-1 no-arrow dropdown-toggle"
+                                                               href="#"
+                                                               role="button"
+                                                               data-toggle="dropdown">
+                                                                <i class="dw dw-more"></i>
+                                                            </a>
+                                                            <div class="dropdown-menu dropdown-menu-right dropdown-menu-icon-list">
+                                                                <button class="dropdown-item" onclick="ouvrirDepartementModal(@patient.id)"><i class="dw dw-edit2"></i> Modifier</button>
+                                                            </div>
+                                                        </div>
 
                                                     </td>
+
                                                 </tr>
 
                                             }
-                                            <tr id="total">
-                                                <td class="bg-primary">Total</td>
-                                                <td class="bg-primary"> </td>
-                                                <td class="bg-primary">@Model.rapportDataList.Sum(p => p.frais) </td>
-                                                <td class="bg-primary">@Model.rapportDataList.Sum(p => p.commission)</td>
-                                                <td class="bg-primary">@Model.rapportDataList.Sum(p => p.enc) </td>
-                                                <td class="bg-primary">@Model.rapportDataList.Sum(p => p.dec) </td>
-                                                <td class="bg-primary">@Model.rapportDataList.Sum(p => p.surplux) </td>
-                                                <td class="bg-primary">@Model.rapportDataList.Sum(p => p.taxe) </td>
-                                                <td class="bg-primary">@Model.rapportDataList.Sum(p => p.depense) </td>
-                                                <td class="bg-primary">@Model.rapportDataList.Sum(p => p.extrat) </td>
-                                                <td class="bg-primary"> </td>
 
-                                            </tr>
-                                           
+
                                         </tbody>
                                     </table>
-
-
                                 }
                                 <div class="container">
                                     <div class="panel panel-primary">
                                         <div class="panel-body">
 
                                             <center>
-                                                <a class="btn btn-primary" href="@Url.Action("Statistique","Admin" ,new { pageNo=(Convert.ToInt32(Model.pageNo - 1) < 1) ? 1 :Convert.ToInt32(Model.pageNo - 1)  ,pageSize=@Model.pageSize,agenceID=@Model.agenceID,caissierID=@Model.caissierID,operateurID=@Model.operateurID,operationID=@Model.operationID,Etat=@Model.Etat,sortBy=@Model.sortBy,DateDebut=@Model.DateDebut,DateFin=@Model.DateFin})">Précédent</a>
+                                                <a class="btn btn-primary"  href="@Url.Action("SoldeCloturerJournees","Superviseur" ,new { pageNo=(Convert.ToInt32(Model.pageNo - 1) < 1) ? 1 :Convert.ToInt32(Model.pageNo - 1)  ,pageSize=@Model.pageSize,agenceID=@Model.agenceID,caissierID=@Model.caissierID,operateurID=@Model.operateurID,operationID=@Model.operationID,Etat=@Model.Etat,sortBy=@Model.sortBy,DateDebut=@Model.DateDebut,DateFin=@Model.DateFin})">Précédent</a>
                                                 <span>@Model.pageNo </span>
 
-                                                <a class="btn btn-primary" href="@Url.Action("Statistique","Admin" ,new { pageNo=(Convert.ToInt32(Model.pageNo) == 0) ? 2 :Convert.ToInt32(Model.pageNo + 1) ,pageSize=Model.pageSize,agenceID=Model.agenceID,caissierID=Model.caissierID,operateurID=Model.operateurID,operationID=Model.operationID,Etat=Model.Etat,sortBy=Model.sortBy,DateDebut=Model.DateDebut,DateFin=Model.DateFin})">Suivant</a>
+                                                <a class="btn btn-primary"  href="@Url.Action("SoldeCloturerJournees","Superviseur" ,new { pageNo=(Convert.ToInt32(Model.pageNo) == 0) ? 2 :Convert.ToInt32(Model.pageNo + 1) ,pageSize=Model.pageSize,agenceID=Model.agenceID,caissierID=Model.caissierID,operateurID=Model.operateurID,operationID=Model.operationID,Etat=Model.Etat,sortBy=Model.sortBy,DateDebut=Model.DateDebut,DateFin=Model.DateFin})">Suivant</a>
 
                                             </center>
 
@@ -534,49 +457,34 @@
                     </div>
                 </div>
             </div>
+        </div>     
 
-        </div>
     </div>
 </div>
 
-<!--POPUP SOLDE REEL-->
-<div id="soldeReelModal" class="modal container-fluid ">
+<!--POPUP DEBUTER JOURNEE-->
+<div id="debuterJournerModal" class="modal container-fluid ">
     <div class="container" style="width:70%;float:right">
         <div class="row">
             <div class="card" style="width:70%">
+                <center> <p style="background-color: white" class="text-warning">Veuillez renseigner les champs pour débuter ta journée</p></center>
                 <div class="card-body">
-                      <div class="row" >
-                        <table class="table table-responsive">
-                            <thead>
-                                <tr>
-                                    <th>Opérateur/ Caisse</th>
-                                    <th>Débuter Journée </th>
-                                    <th>Cloturer Journée</th>
-                                    <th>Solde Réels</th>
-                                    <th class="bg-danger">Somme Manquante</th>
-                                   
-                                </tr>
-                            </thead>
-                            <tbody id="detailsBody">                            
-                                
-
-                                
-
-
-
-                            </tbody>
-                        </table>
-
-
+                    <center> <p style="background-color: white; color: red" id="smsDebuterJournerModal"></p></center>
+                    <center> <p style="background-color:white;color:green" id="messageDebuterJournerModal"></p></center>
+                    <div class="row" id="debuterJournerModalBody">
+                       
                     </div>
-                    <div class="row">
-                        <div class="col-lg-4 col-xl-4 col-sm-4 col-md-4">
+                    <input id="debuterJournerModalBodyID" type="text" class="form-control" hidden>
 
+
+
+                    <div class="row">
+                        <div class="col-lg-6 col-xl-6 col-sm-6 col-md-6 p-2">
+                            <a class="btn btn-primary" onclick="debuterJournee()" style="color: white; width: 100%"> Modifier</a>
                         </div>
-                        <div class="col-lg-4 col-xl-4 col-sm-4 col-md-4">
-                            <a class="btn btn-primary" onclick=" document.getElementById('soldeReelModal').style.display = 'none'" style="color: white; width: 100% ">Fermer </a>
-                        </div>
-                        <div class="col-lg-4 col-xl-4 col-sm-4 col-md-4">
+
+                        <div class="col-lg-6 col-xl-6 col-sm-6 col-md-6 p-2">
+                            <a class="btn btn-primary" onclick=" document.getElementById('debuterJournerModal').style.display = 'none'" style="color: white; width: 100% ">Annuler</a>
 
                         </div>
                     </div>
@@ -587,7 +495,15 @@
 
 
 </div>
+
+
+
+
+
+
 <script type="text/javascript" src="https://unpkg.com/xlsx@0.15.1/dist/xlsx.full.min.js"></script>
+
+
 
 <script type="text/javascript">
 
@@ -629,38 +545,7 @@
 
     }
 
-    function Detail(id)
-    {
-        var debuters = @Html.Raw(Json.Encode(Model.DebuterJourneeRapports));
-        var cloturers = @Html.Raw(Json.Encode(Model.CloturerJourneeRapports));
-        var operateurs = @Html.Raw(Json.Encode(Model.operateurs));
-        var reels = @Html.Raw(Json.Encode(Model.SoldeReelRapports));
 
-        var debuter = debuters.filter(e => e.id == id)[0];
-        var cloturer = cloturers.filter(e => e.soldeDebuterJourneeID == id)[0];
-        var reel = reels.filter(e => e.soldeDebuterJourneeID == id)[0];
-
-        if (cloturer != undefined)
-        {
-            $("#detailsBody").empty()
-            $("#detailsBody").append(`<tr><td> Caisse</td><td>${debuter.caisse}</td><td>${cloturer.caisse}</td><td>${reel.caisse}</td><td class="bg-danger">${debuter.caisse - cloturer.caisse}</td> </tr>`);
-            debuter.soldeDebuterJourneeItems.forEach(p => $("#detailsBody").append(`<tr><td> ${operateurs.filter(e => e.id == p.operateurID)[0].libelle}</td><td>${debuter.caisse}</td><td>${cloturer.caisse}</td><td>${reel.caisse}</td><td class="bg-danger">${debuter.caisse - cloturer.caisse}</td> </tr>`))
-            document.getElementById('soldeReelModal').style.display = 'block'
-
-        }
-        else {
-            $("#detailsBody").append(`<tr><td colspan="4" class="text-center">La journée n'est pas terminée</td><td></td></tr>`);
-
-            document.getElementById('soldeReelModal').style.display = 'block'
-
-
-        }
-
-
-
-       
-       
-    }
 </script>
 
 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.22/pdfmake.min.js"></script>
@@ -796,6 +681,151 @@
 
 </script>
 
+<!--JS SOLDE DEBUTER JOURNEE-->
 
 
+<script>
+  
+
+    function hideError() {
+
+        if ($('#Name').val() != null) { $('#NameError').hide(); }
+
+
+    }
+
+
+
+    function debuterJournee()
+    {
+        var operateurs = [];
+
+        var listes = @Html.Raw(Json.Encode(Model.operateurs));
+        listes.forEach(p => {
+            operateurs.push({
+                montant: $('#R'+p.id).val(),
+                operateurID: p.id
+
+                })
+
+
+        })
+        var body = {
+            soldeCloturerJourneeDtoRequests: operateurs,
+            caisse: $('#Caisse').val(),
+            id: document.getElementById('debuterJournerModalBodyID').value
+
+        }
+        document.getElementById("messageDebuterJournerModal").innerText = null
+        document.getElementById("smsDebuterJournerModal").innerText = null
+         $.post('@Url.Action("AjouterSoldeCloturerJournee")', body,
+            function (rep)
+            {
+                if (rep.code == 200)
+                {
+                    document.getElementById("messageDebuterJournerModal").innerText = rep.message;
+                    document.getElementById("smsDebuterJournerModal").innerText = null
+                    setTimeout(() => { document.getElementById('debuterJournerModal').style.display = 'none'; window.location.reload() }, 1000);
+                }
+                else
+                {
+                    document.getElementById("smsDebuterJournerModal").innerText = rep.message ;
+                    document.getElementById("messageDebuterJournerModal").innerText = null
+
+                }
+
+
+
+             }).fail(function (xhr, status, error) {
+                 document.getElementById("smsDebuterJournerModal").innerText = " une erreur interne est survenue  ";
+                 document.getElementById("messageDebuterJournerModal").innerText = null
+
+            });
+
+
+
+
+    }
+
+
+    function ouvrirDepartementModal(departementID)
+    {
+        document.getElementById("messageDebuterJournerModal").innerText = null
+        document.getElementById("smsDebuterJournerModal").innerText = null
+        var departements = @Html.Raw(Json.Encode(Model.soldeCloturerJournees));
+        var operateurs = @Html.Raw(Json.Encode(Model.operateurs));
+        var operateurSoldes = operateurs.filter(e => e.id == departementID)[0];
+
+        var departement = departements.filter(e => e.id == departementID)[0];
+        var soldeDebuterJourneeItems = departement.soldeCloturerJourneeItems
+        $('#debuterJournerModalBody').empty()
+        document.getElementById('debuterJournerModalBodyID').value = departementID
+        $('#debuterJournerModalBody').append(`
+                           <div class="col-lg-6 col-xl-6 col-sm-6 col-md-6">
+                                <div class="input-group input-group-outline">
+                                    <label class="text" style="width:100%">Caisse</label>
+                                    <input type="text" onkeypress="return isNumberKey2(this.id);" value="${departement.caisse}" id="Caisse" name="Caisse" class="form-control" required>
+                                </div>
+                            </div>
+                    </tr>`);
+
+
+
+        soldeDebuterJourneeItems.forEach(y => $('#debuterJournerModalBody').append(`
+                            <div class="col-lg-6 col-xl-6 col-sm-6 col-md-6">
+                                <div class="input-group input-group-outline">
+                                    <label class="text" style="width:100%">${operateurs.filter(e => e.id == y.operateurID)[0].libelle}</label >
+                                    <input type="text" value="${y.montant}" onkeypress="return isNumberKey2(this.id);" id="R${y.operateurID}" name="Name" class="form-control" required>
+                                </div>
+                            </div>`))
+        document.getElementById('debuterJournerModal').style.display = 'block'
+
+
+
+
+     }
+    function bloquageModal(departementID)
+    {
+        document.getElementById('bloquageModal').style.display = 'block'
+        document.getElementById('departementID').value = departementID
+
+
+
+    }
+    function bloquerDepartement()
+    {
+        document.getElementById("messageB").innerText = null
+        document.getElementById("smsB").innerText = null
+
+               $.post('@Url.Action("desactiverOperateur")',
+
+                {
+                    No: document.getElementById('departementID').value
+                },
+            function (rep)
+            {
+                if (rep.code == 200)
+                {
+
+                    document.getElementById("messageB").innerText = rep.message;
+                    document.getElementById("smsB").innerText = null
+                    window.location.reload()
+                }
+                else
+                {
+                    document.getElementById("smsB").innerText = rep.message;
+                    document.getElementById("messageB").innerText = null
+                }
+            }
+            ).fail(function (xhr, status, error)
+            {
+                                //Ajax request failed.
+                document.getElementById("smsB").innerText = " une erreur interne est survenue coté client";
+                document.getElementById("messageB").innerText = null
+
+            });
+    }
+
+
+</script>
 

@@ -21,7 +21,7 @@ using static Multitrans.Models.Tempon;
 
 namespace Multitrans.Controllers
 {
-    public class AdminController : Controller
+    public class SuperviseurController : Controller
     {
         private IAuthentificationRepository _authentificationRepository;
 		private IUserRepository _userRepository; 
@@ -34,7 +34,7 @@ namespace Multitrans.Controllers
 		private ISoldeReelRepository _soldeReelRepository;
 		private IDepenseExtratRepository _depense_extratRepository;
 
-		public AdminController(IAuthentificationRepository authentificationRepository,
+		public SuperviseurController(IAuthentificationRepository authentificationRepository,
 						ITransactionRepository transactionRepository,
 			IOperateurRepository operateurRepository,
 			IDepenseExtratRepository depense_extratRepository,
@@ -67,16 +67,12 @@ namespace Multitrans.Controllers
                 if (Session["utilisateurID"] != null && Session["structureID"] != null && Session["FullName"] != null && Session["token"] != null)
                 {
 
-                    Reponse reponseOperateur = _operateurRepository.ListeOperateur(Convert.ToInt64(Session["structureID"]), Convert.ToString(Session["token"]));
-                    Reponse reponseUser = _userRepository.ListeUser(Convert.ToInt64(Session["structureID"]), Convert.ToString(Session["token"]));
-                    Reponse reponseAgence = _agenceRepository.ListeAgence(Convert.ToInt64(Session["structureID"]), Convert.ToString(Session["token"]));
+					Reponse reponseOperateur = _operateurRepository.ListeOperateurCaisse(Convert.ToInt64(Session["structureID"]), Convert.ToInt64(Session["agenceID"]), Convert.ToString(Session["token"]));
+					Reponse reponseUser = _userRepository.ListeUserByAgence(Convert.ToInt64(Session["agenceID"]), Convert.ToString(Session["token"]));
+					ViewBag.message = reponseUser.message;
 
-
-
-
-                    StatistiqueData statistiqueData = new StatistiqueData
+					StatistiqueData statistiqueData = new StatistiqueData
                     {
-                        agences = Utils.ToObjectList<Agence>(reponseAgence.result),
                         operateurs = Utils.ToObjectList<Operateur>(reponseOperateur.result),
                         users = Utils.ToObjectList<User>(reponseUser.result)                       
 
@@ -104,21 +100,23 @@ namespace Multitrans.Controllers
 
 		public ActionResult Statistique(int? pageNo, int? pageSize, long? agenceID, long? caissierID, long? operateurID, long? operationID, string Etat, string sortBy, long? DateDebut, long? DateFin)
 		{
-			Reponse reponseExtratDepense = _depense_extratRepository.ListeDepenseExtrat(Convert.ToInt64(Session["structureID"]), Convert.ToString(Session["token"]));
-			Reponse reponseOperateur = _operateurRepository.ListeOperateur(Convert.ToInt64(Session["structureID"]), Convert.ToString(Session["token"]));
-			Reponse reponseOperation = _operationRepository.ListeOperation(Convert.ToInt64(Session["structureID"]), Convert.ToString(Session["token"]));
-            Reponse reponseDebuterJournee = _soldeDebuterJourneeRepository.ListeSoldeDebuterJournee(Convert.ToInt64(Session["structureID"]), agenceID, caissierID, operateurID, null, null, DateDebut, DateFin, pageNo, pageSize, sortBy, Convert.ToString(Session["token"]));
-            Reponse reponseTransactions = _transactionRepository.ListeTransactionRapports(Convert.ToInt64(Session["structureID"]), agenceID, caissierID, operateurID, operationID, Etat, DateDebut, DateFin,sortBy, Convert.ToString(Session["token"]));
-			Reponse reponseUser = _userRepository.ListeUser(Convert.ToInt64(Session["structureID"]), Convert.ToString(Session["token"]));
-			Reponse reponseAgence = _agenceRepository.ListeAgence(Convert.ToInt64(Session["structureID"]), Convert.ToString(Session["token"]));
 
-            Reponse reponseDebuterJourneeRapport = _soldeDebuterJourneeRepository.ListeSoldeDebuterJournee(Convert.ToInt64(Session["structureID"]), Convert.ToString(Session["token"]));
+			Reponse reponseOperation = _operationRepository.ListeOperation(Convert.ToInt64(Session["structureID"]), Convert.ToString(Session["token"]));
+			Reponse reponseOperateur = _operateurRepository.ListeOperateurCaisse(Convert.ToInt64(Session["structureID"]), Convert.ToInt64(Session["agenceID"]), Convert.ToString(Session["token"]));
+
+
+			Reponse reponseExtratDepense = _depense_extratRepository.ListeDepenseExtrat(Convert.ToInt64(Session["structureID"]), Convert.ToString(Session["token"]));
+
+			Reponse reponseDebuterJournee = _soldeDebuterJourneeRepository.ListeSoldeDebuterJournee(Convert.ToInt64(Session["structureID"]), Convert.ToInt64(Session["agenceID"]), caissierID, operateurID, null, null, DateDebut, DateFin, pageNo, pageSize, sortBy, Convert.ToString(Session["token"]));
+            Reponse reponseTransactions = _transactionRepository.ListeTransactionRapports(Convert.ToInt64(Session["structureID"]), Convert.ToInt64(Session["agenceID"]), caissierID, operateurID, operationID, Etat, DateDebut, DateFin,sortBy, Convert.ToString(Session["token"]));
+			Reponse reponseUser = _userRepository.ListeUserByAgence(Convert.ToInt64(Session["agenceID"]), Convert.ToString(Session["token"]));
+
+			Reponse reponseDebuterJourneeRapport = _soldeDebuterJourneeRepository.ListeSoldeDebuterJournee(Convert.ToInt64(Session["structureID"]), Convert.ToString(Session["token"]));
             Reponse reponseCloturerJourneeRapport = _soldeCloturerJourneeRepository.ListeSoldeCloturerJournee(Convert.ToInt64(Session["structureID"]), Convert.ToString(Session["token"]));
             Reponse reponseSoldeReelRapport = _soldeReelRepository.soldeReels(Convert.ToInt64(Session["structureID"]), Convert.ToString(Session["token"]));
 
 
             List<Models.Operateur> operateurs = Utils.ToObjectList<Models.Operateur>(reponseOperateur.result);
-            List<Agence> agences = Utils.ToObjectList<Agence>(reponseAgence.result);
             List<Models.Operation> operations = Utils.ToObjectList<Models.Operation>(reponseOperation.result);
             List<Transaction> transactions = Utils.ToObjectList<Transaction>(reponseTransactions.result);
             List<User> users = Utils.ToObjectList<User>(reponseUser.result);
@@ -159,9 +157,8 @@ namespace Multitrans.Controllers
                 operateurs=operateurs,
                 operations= operations,
 				rapportDataList= lst,
-                agences= agences,
                 users= users,
-                agenceID = agenceID,
+                agenceID = Convert.ToInt64(Session["agenceID"]),
 				caissierID = caissierID,
 				operateurID = operateurID,
 				operationID = operationID,
@@ -221,15 +218,13 @@ namespace Multitrans.Controllers
             {
                 if ( Session["utilisateurID"] != null && Session["structureID"] != null && Session["token"] != null)
                 {
-                    Reponse depense_extratRepository = _depense_extratRepository.ListeDepenseExtrat(Convert.ToInt64(Session["structureID"]), agenceID, caissierID, DateDebut, DateFin,type, pageNo, pageSize, sortBy, Convert.ToString(Session["token"]));
-                    Reponse reponseUser = _userRepository.ListeUser(Convert.ToInt64(Session["structureID"]), Convert.ToString(Session["token"]));
-                    Reponse reponseAgence = _agenceRepository.ListeAgence(Convert.ToInt64(Session["structureID"]), Convert.ToString(Session["token"]));
+                    Reponse depense_extratRepository = _depense_extratRepository.ListeDepenseExtrat(Convert.ToInt64(Session["structureID"]), Convert.ToInt64(Session["agenceID"]), caissierID, DateDebut, DateFin,type, pageNo, pageSize, sortBy, Convert.ToString(Session["token"]));
+					Reponse reponseUser = _userRepository.ListeUserByAgence(Convert.ToInt64(Session["agenceID"]), Convert.ToString(Session["token"]));
 
-                StatistiqueRapportData StatistiqueRapportDats = new StatistiqueRapportData
+					StatistiqueRapportData StatistiqueRapportDats = new StatistiqueRapportData
                     {
-                       agences = Utils.ToObjectList<Agence>(reponseAgence.result),
-                       users = Utils.ToObjectList<User>(reponseUser.result),
-                       depenseExtrats = Utils.ToObjectList<Depense_extrat>(depense_extratRepository.result),
+                        users = Utils.ToObjectList<User>(reponseUser.result),
+                        depenseExtrats = Utils.ToObjectList<Depense_extrat>(depense_extratRepository.result),
 						type=type,
 					    agenceID = agenceID,
                         caissierID = caissierID,                       
@@ -298,15 +293,14 @@ namespace Multitrans.Controllers
             {
                 if ( Session["utilisateurID"] != null && Session["structureID"] != null && Session["token"] != null)
                 {
-                    Reponse reponseOperateur = _operateurRepository.ListeOperateur(Convert.ToInt64(Session["structureID"]), Convert.ToString(Session["token"]));
-                    Reponse reponseOperation = _operationRepository.ListeOperation(Convert.ToInt64(Session["structureID"]), Convert.ToString(Session["token"]));
-                    Reponse reponseDebuterJournee = _soldeDebuterJourneeRepository.ListeSoldeDebuterJournee(Convert.ToInt64(Session["structureID"]), agenceID, caissierID, operateurID, operationID, Etat, DateDebut, DateFin, pageNo, pageSize, sortBy, Convert.ToString(Session["token"]));
-                    Reponse reponseUser = _userRepository.ListeUser(Convert.ToInt64(Session["structureID"]), Convert.ToString(Session["token"]));
-                    Reponse reponseAgence = _agenceRepository.ListeAgence(Convert.ToInt64(Session["structureID"]), Convert.ToString(Session["token"]));
+					Reponse reponseOperateur = _operateurRepository.ListeOperateurCaisse(Convert.ToInt64(Session["structureID"]), Convert.ToInt64(Session["agenceID"]), Convert.ToString(Session["token"]));
 
-                    StatistiqueRapportData StatistiqueRapportDats = new StatistiqueRapportData
+                    Reponse reponseOperation = _operationRepository.ListeOperation(Convert.ToInt64(Session["structureID"]), Convert.ToString(Session["token"]));
+                    Reponse reponseDebuterJournee = _soldeDebuterJourneeRepository.ListeSoldeDebuterJournee(Convert.ToInt64(Session["structureID"]), Convert.ToInt64(Session["agenceID"]), caissierID, operateurID, operationID, Etat, DateDebut, DateFin, pageNo, pageSize, sortBy, Convert.ToString(Session["token"]));
+					Reponse reponseUser = _userRepository.ListeUserByAgence(Convert.ToInt64(Session["agenceID"]), Convert.ToString(Session["token"]));
+
+					StatistiqueRapportData StatistiqueRapportDats = new StatistiqueRapportData
                     {
-                        agences = Utils.ToObjectList<Agence>(reponseAgence.result),
                         operations = Utils.ToObjectList<Models.Operation>(reponseOperation.result),
                         users = Utils.ToObjectList<User>(reponseUser.result),
                         soldeDebuterJournees = Utils.ToObjectList<SoldeDebuterJournee>(reponseDebuterJournee.result),
@@ -380,15 +374,13 @@ namespace Multitrans.Controllers
             {
                 if (Session["utilisateurID"] != null && Session["structureID"] != null && Session["token"] != null)
                 {
-                    Reponse reponseOperateur = _operateurRepository.ListeOperateur(Convert.ToInt64(Session["structureID"]), Convert.ToString(Session["token"]));
+					Reponse reponseOperateur = _operateurRepository.ListeOperateurCaisse(Convert.ToInt64(Session["structureID"]), Convert.ToInt64(Session["agenceID"]), Convert.ToString(Session["token"]));
                     Reponse reponseOperation = _operationRepository.ListeOperation(Convert.ToInt64(Session["structureID"]), Convert.ToString(Session["token"]));
-                    Reponse reponseDebuterJournee = _soldeCloturerJourneeRepository.ListeSoldeCloturerJournee(Convert.ToInt64(Session["structureID"]), agenceID, caissierID, operateurID, operationID, Etat, DateDebut, DateFin, pageNo, pageSize, sortBy, Convert.ToString(Session["token"]));
-                    Reponse reponseUser = _userRepository.ListeUser(Convert.ToInt64(Session["structureID"]), Convert.ToString(Session["token"]));
-                    Reponse reponseAgence = _agenceRepository.ListeAgence(Convert.ToInt64(Session["structureID"]), Convert.ToString(Session["token"]));
+                    Reponse reponseDebuterJournee = _soldeCloturerJourneeRepository.ListeSoldeCloturerJournee(Convert.ToInt64(Session["structureID"]), Convert.ToInt64(Session["agenceID"]), caissierID, operateurID, operationID, Etat, DateDebut, DateFin, pageNo, pageSize, sortBy, Convert.ToString(Session["token"]));
+                  	Reponse reponseUser = _userRepository.ListeUserByAgence(Convert.ToInt64(Session["agenceID"]), Convert.ToString(Session["token"]));
 
-                    StatistiqueRapportData StatistiqueRapportDats = new StatistiqueRapportData
+					StatistiqueRapportData StatistiqueRapportDats = new StatistiqueRapportData
                     {
-                        agences = Utils.ToObjectList<Agence>(reponseAgence.result),
                         operations = Utils.ToObjectList<Models.Operation>(reponseOperation.result),
                         users = Utils.ToObjectList<User>(reponseUser.result),
 						soldeCloturerJournees= Utils.ToObjectList<SoldeCloturerJournee>(reponseDebuterJournee.result),
@@ -559,7 +551,7 @@ namespace Multitrans.Controllers
 			}
 			catch
 			{
-				return RedirectToAction("Index", "Admin");
+				return RedirectToAction("Index", "Superviseur");
 
 			}
 
@@ -576,19 +568,16 @@ namespace Multitrans.Controllers
 			{
 				if (Session["utilisateurID"] != null && Session["structureID"] != null && Session["FullName"] != null && Session["token"] != null)
 				{
-					
-					Reponse reponseOperateur = _operateurRepository.ListeOperateur(Convert.ToInt64(Session["structureID"]), Convert.ToString(Session["token"]));
-					Reponse reponseOperation = _operationRepository.ListeOperation(Convert.ToInt64(Session["structureID"]), Convert.ToString(Session["token"]));
-					Reponse reponseUser = _userRepository.ListeUser(Convert.ToInt64(Session["structureID"]), Convert.ToString(Session["token"]));
-					Reponse reponseAgence = _agenceRepository.ListeAgence(Convert.ToInt64(Session["structureID"]), Convert.ToString(Session["token"]));
-					
-				    Reponse reponse = _transactionRepository.ListeTransactions(Convert.ToInt64(Session["structureID"]),agenceID,caissierID,operateurID,operationID,Etat, DateDebut, DateFin, pageNo,pageSize,sortBy, Convert.ToString(Session["token"]));
+					Reponse reponseOperateur = _operateurRepository.ListeOperateurCaisse(Convert.ToInt64(Session["structureID"]), Convert.ToInt64(Session["agenceID"]), Convert.ToString(Session["token"]));
 
-			
+					Reponse reponseOperation = _operationRepository.ListeOperation(Convert.ToInt64(Session["structureID"]), Convert.ToString(Session["token"]));
+					Reponse reponseUser = _userRepository.ListeUserByAgence(Convert.ToInt64(Session["agenceID"]), Convert.ToString(Session["token"]));
+					
+				    Reponse reponse = _transactionRepository.ListeTransactions(Convert.ToInt64(Session["structureID"]), Convert.ToInt64(Session["agenceID"]), caissierID,operateurID,operationID,Etat, DateDebut, DateFin, pageNo,pageSize,sortBy, Convert.ToString(Session["token"]));
+
 
 				StatistiqueData statistiqueData = new StatistiqueData
 				{
-					agences = Utils.ToObjectList<Agence>(reponseAgence.result),
 					operateurs = Utils.ToObjectList<Operateur>(reponseOperateur.result),
 					operations = Utils.ToObjectList<Models.Operation>(reponseOperation.result),
 					transactions = Utils.ToObjectList<Transaction>(reponse.result),
@@ -656,7 +645,7 @@ namespace Multitrans.Controllers
 			}
 			catch (Exception)
 			{
-				return RedirectToAction("Dashboard", "Admin");
+				return RedirectToAction("Dashboard", "Superviseur");
 			}
 		}
 
@@ -775,32 +764,21 @@ namespace Multitrans.Controllers
 
 			try
 			{
-				if (Session["utilisateurID"] != null && Session["structureID"] != null && Session["FullName"] != null && Session["token"] != null)
+				if (Session["agenceID"] != null && Session["structureID"] != null && Session["FullName"] != null && Session["token"] != null)
 				{
-					Reponse reponseUser = _userRepository.ListeUser(Convert.ToInt64(Session["structureID"]),Convert.ToString(Session["token"]));
-					Reponse reponseAgence = _agenceRepository.ListeAgence(Convert.ToInt64(Session["structureID"]), Convert.ToString(Session["token"]));
-					if (reponseUser.code == 200)
+					Reponse reponseUser = _userRepository.ListeUserByAgence(Convert.ToInt64(Session["agenceID"]),Convert.ToString(Session["token"]));
+                    if (reponseUser.code == 200)
 					{
 						var users = Utils.ToObjectList<User>(reponseUser.result);
 
-						if (reponseAgence.code == 200)
-						{
+						return View(users);
 
-							var agences = Utils.ToObjectList<Agence>(reponseAgence.result);
-							var tpl = new Tuple<List<User>, List<Agence>>(users, agences);
-							return View(tpl);
-
-						}
-						else
-						{
-							var tpl = new Tuple<List<User>, List<Agence>>(users, null);
-							return View(tpl);
-						}					
+										
 
 					}
 					else
 					{
-						var tpl = new Tuple<List<User>, List<Agence>>(null, null);
+						var tpl = new List<User>();
 						return View(tpl);
 					}			
 
@@ -814,7 +792,7 @@ namespace Multitrans.Controllers
 			}
 			catch
 			{
-				return RedirectToAction("Index", "Admin");
+				return RedirectToAction("Index", "Superviseur");
 
 			}
 
@@ -934,7 +912,7 @@ namespace Multitrans.Controllers
             }
             catch
             {
-                return RedirectToAction("Index", "Admin");
+                return RedirectToAction("Index", "Superviseur");
 
             }
 
@@ -1029,7 +1007,7 @@ namespace Multitrans.Controllers
             {
                 if (Session["utilisateurID"] != null && Session["structureID"] != null && Session["FullName"] != null && Session["token"] != null)
                 {
-                    Reponse reponse = _operateurRepository.ListeOperateur(Convert.ToInt64(Session["structureID"]), Convert.ToString(Session["token"]));
+					Reponse reponse = _operateurRepository.ListeOperateurCaisse(Convert.ToInt64(Session["structureID"]), Convert.ToInt64(Session["agenceID"]), Convert.ToString(Session["token"]));
                     if (reponse.code == 200)
                     {
                         var agences =(List<Operateur>) Utils.ToObjectList<Operateur>(reponse.result);
@@ -1054,7 +1032,7 @@ namespace Multitrans.Controllers
             }
             catch
             {
-                return RedirectToAction("Index", "Admin");
+                return RedirectToAction("Index", "Superviseur");
 
             }
 

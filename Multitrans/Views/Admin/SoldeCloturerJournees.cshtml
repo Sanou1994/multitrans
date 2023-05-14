@@ -3,6 +3,8 @@
     ViewData["Title"] = "Dashboard Manager";
     ViewData["UserName"] = Convert.ToString(Session["fullName"]);
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    var nb_operateur = Model.operateurs.Count();
+
 }
 @using Multitrans.Models
 @using PagedList.Mvc;
@@ -398,8 +400,10 @@
                                                 <tr>
                                                     <td class="table-plus">@patient.id</td>
                                                     <td>@Model.agences.Where(t => t.id == patient.agenceID).Select(k => k.nom).FirstOrDefault()</td>
-                                                    <td>@Model.users.Where(t => t.id == patient.idU).Select(k =>k.prenom + " "+ k.nom).FirstOrDefault()</td>
+                                                    <td>@Model.users.Where(t => t.id == patient.idU).Select(k => k.prenom + " " + k.nom).FirstOrDefault()</td>
                                                     <td>@patient.caisse</td>
+                                                    @{ var reste = nb_operateur - patient.soldeCloturerJourneeItems.Count();}
+
                                                     @foreach (var item in patient.soldeCloturerJourneeItems)
                                                     {
                                                         if (item.montant != 0)
@@ -412,6 +416,14 @@
                                                             <td>0</td>
 
                                                         }
+
+                                                    }
+                                                    @for (int i = 0; i < reste; i++)
+                                                    {
+
+                                                        <td>0</td>
+
+
 
                                                     }
                                                     @{ var date = (new DateTime(1970, 1, 1)).AddMilliseconds(Convert.ToDouble(patient.date)); }

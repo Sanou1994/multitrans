@@ -10,7 +10,8 @@ namespace Multitrans.Repositories
         Reponse ListeUser(long? type, string tokenKey);
         Reponse ChercherUser(long? id, string tokenKey);
         Reponse AjouterUser(User user, string tokenKey);
-       
-        Reponse bloquerUser(long? id, string tokenKey);
+		Reponse ListeUserByAgence(long? id, string tokenKey);
+
+		Reponse bloquerUser(long? id, string tokenKey);
     }
 }

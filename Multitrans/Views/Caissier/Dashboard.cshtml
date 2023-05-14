@@ -50,112 +50,100 @@
         <div class="title pb-20">
             <div class="page-header">
                 <div class="row pb-2">
-                    <div class="col-md-4 col-sm-12">
+                    <div class="col-md-4 col-sm-12 p-2">
                         @if (Model.soldeDebuterJourneeTermine)
                         {
-                            <button type="button" class="btn btn-outline-warning"><i class="fa fa-star"></i>Impossible Débuter Journée </button>
+                            <button type="button" style="width:60%" class="btn btn-outline-warning" onclick=" document.getElementById('soldeReelModal').style.display = 'block'"><i class="fa fa-university"></i>Voir Solde actuel</button>
+
 
                         }
                         else
                         {
+                            <button type="button"  style="width:60%" class="btn btn-outline-warning"><i class="fa fa-university"></i>Impossible de voir solde actuel </button>
+
+
+                        }
+
+
+                    </div>
+
+
+                    @if (!Model.soldeDebuterJourneeTermine)
+                    {
+                        <div class="col-md-4 col-sm-12">
+
                             <button type="button" class="btn btn-outline-warning" onclick=" debuterJournerModal()"><i class="fa fa-star"></i>Débuter Journée</button>
+                        </div>
 
-                        }
+                    }
+                    @if (Model.soldeDebuterJourneeTermine)
+                    {
+                        <div class="col-md-4 col-sm-12 pt-2">
+                            <button type="button" style="width:60%" class="btn btn-success" onclick=" transactionDepotModal()"><i class="fa fa-refresh"></i>Faire Transaction</button>
 
+                        </div>
 
-                    </div>
+                    }
+                    else
+                    {
+                        <div class="col-md-4 col-sm-12 ">
+                            <button type="button" class="btn btn-success" onclick=" transactionDepotModal()"><i class="fa fa-refresh"></i> Transaction</button>
 
-                    <div class="col-md-4 col-sm-12 ">
-
+                        </div>
+                    }
+                    <div class="col-md-4 col-sm-12 pt-2">
                         @if (Model.soldeDebuterJourneeTermine)
                         {
-                            <button type="button" class="btn btn-success" onclick=" transactionDepotModal()"><i class="fa fa-refresh"></i> Faire  transaction</button>
+                            <button type="button" style="width:60%" class="btn btn-primary" onclick=" extratModal()"><i class="fa fa-plus-circle"></i>Faire  Extrat</button>
 
                         }
                         else
                         {
-                            <button type="button" class="btn btn-success"><i class="fa fa-refresh"></i>Impossible de faire  transaction</button>
+                            <button type="button" class="btn btn-primary"><i class="fa fa-plus-circle"></i>Impossible de faire extrat</button>
 
                         }
 
                     </div>
 
-                    <div class="col-md-4 col-sm-12 ">
+                    <div class="col-md-4 col-sm-12 pt-2 ">
+
+
+                    </div>
+                    <div class="col-md-4 col-sm-12 pt-2 ">
+
                         @if (Model.soldeDebuterJourneeTermine)
                         {
-                            <button type="button" class="btn btn-danger" onclick=" cloturerJourneeModal()"><i class="fa fa-close"></i>Terminer Journée</button>
+                            <button type="button" style="width:60%" class="btn btn-danger" onclick="depenseModal()"><i class="fa fa-refresh"></i>Faire   Dépense</button>
 
                         }
                         else
                         {
-                            <button type="button" class="btn btn-danger"><i class="fa fa-close"></i>Impossible de Terminer Journée</button>
+                            <button type="button" class="btn btn-danger"><i class="fa fa-refresh"></i>Impossible de faire  une dépense</button>
 
                         }
 
                     </div>
-
-
-                </div>
-                <div class="row">
-
-                    <div class="col-md-3 col-sm-12">
+                    <div class="col-md-4 col-sm-12 pt-2 ">
                         @if (Model.soldeDebuterJourneeTermine)
                         {
-                            <button type="button" class="btn btn-outline-warning" onclick=" document.getElementById('soldeReelModal').style.display = 'block'"><i class="fa fa-university"></i> Voir solde actuel</button>
-
+                            <button type="button" style="width:60%" class="btn btn-outline-warning" onclick=" cloturerJourneeModal()"><i class="fa fa-close"></i>Terminer</button>
 
                         }
                         else
                         {
-                            <button type="button" class="btn btn-outline-warning"><i class="fa fa-university"></i>Impossible de voir solde actuel </button>
-
-
-                        }
-
-
-                    </div>
-
-                    <div class="col-md-3 col-sm-12 ">
-
-                        @if (Model.soldeDebuterJourneeTermine)
-                        {
-                            <button type="button" class="btn btn-success" onclick="depenseModal()"><i class="fa fa-refresh"></i> Faire  une dépense</button>
-
-                        }
-                        else
-                        {
-                            <button type="button" class="btn btn-success"><i class="fa fa-refresh"></i>Impossible de faire  une dépense</button>
-
-                        }
-
-                    </div>
-                    <div class="col-md-3 col-sm-12 ">
-                        @if (Model.soldeDebuterJourneeTermine)
-                        {
-                            <button type="button" class="btn btn-warning" onclick=" extratModal()"><i class="fa fa-plus-circle"></i>Faire un extrat</button>
-
-                        }
-                        else
-                        {
-                            <button type="button" class="btn btn-warning"><i class="fa fa-plus-circle"></i>Impossible de faire extrat</button>
+                            <button type="button" class="btn btn-warning"><i class="fa fa-close"></i>Impossible de Terminer Journée</button>
 
                         }
 
                     </div>
 
-                    <div class="col-md-3 col-sm-12 ">
-                        @if (Model.soldeDebuterJourneeTermine)
-                        {
-                            <button type="button" class="btn btn-info" onclick=" cloturerJourneeModal()"><i class="fa fa-eye"></i>Voir statistique</button>
 
-                        }
-                        else
-                        {
-                            <button type="button" class="btn btn-info"><i class="fa fa-eye"></i>Impossible de voir statistique</button>
 
-                        }
 
-                    </div>
+
+
+
+
 
                 </div>
             </div>
@@ -454,7 +442,7 @@
                         <div class="col-lg-4 col-xl-4 col-sm-4 col-md-4">
                             <div class="input-group input-group-outline">
                                 <label class="text" style="width:100%">Opérateur</label>
-                                <select name="Operateur" id="Operateur" class="form-control" required>
+                                <select name="Operateur"  id="Operateur" class="form-control" required>
                                     <option value="0">Choisir un Opérateur</option>
                                     @foreach (var operateur in Model.operateurs)
                                     {
@@ -495,21 +483,16 @@
                         <div class="col-lg-4 col-xl-4 col-sm-4 col-md-4">
                             <div class="input-group input-group-outline">
                                 <label class="text" style="width:100%">Montant</label>
-                                <input type="text" onkeypress="return isNumberKey2(this.id);" id="Montant" name="Montant" class="form-control" required>
+                                <input type="text" onchange="Frais()" onkeypress="return isNumberKey2(this.id);" id="Montant" name="Montant" class="form-control" required>
                             </div>
                         </div>
                         <div class="col-lg-4 col-xl-4 col-sm-4 col-md-4">
                             <div class="input-group input-group-outline">
-                                <label class="text" style="width:100%">Frais</label>
-                                <input type="text" onkeypress="return isNumberKey2(this.id);" id="Frais" name="Frais" class="form-control">
+                                <label class="text" style="width:100%">Frais/Commission</label>
+                                <input type="text" onkeypress="return isNumberKey2(this.id);" id="Frais" name="Frais" class="form-control" disabled>
                             </div>
                         </div>
-                        <div class="col-lg-4 col-xl-4 col-sm-4 col-md-4">
-                            <div class="input-group input-group-outline">
-                                <label class="text" style="width:100%">Commission</label>
-                                <input type="text" onkeypress="return isNumberKey2(this.id);" id="Commission" name="Commission" class="form-control">
-                            </div>
-                        </div>
+                       
                         <div class="col-lg-4 col-xl-4 col-sm-4 col-md-4">
                             <div class="input-group input-group-outline">
                                 <label class="text" style="width:100%">Surplux</label>
@@ -524,6 +507,7 @@
                         </div>
                     </div>
                     <input type="text" id="sens" name="sens" class="form-control" hidden>
+                    <input type="text" id="operateurChoisi" name="operateurChoisi" class="form-control" hidden>
 
 
 
@@ -932,6 +916,11 @@
 
 <!--JS DEPOT-->
 <script type="text/javascript">
+    document.getElementById('Montant').addEventListener('input', Frais);
+
+
+
+
     function isNumberKey2(evt) {
         var charCode = (evt.which) ? evt.which : event.keyCode;
         if (charCode != 46 && charCode > 31
@@ -1000,13 +989,33 @@
         $('#sens').val(operation.sens)
 
     }
+     function Frais()
+    {
+        var listes = @Html.Raw(Json.Encode(Model.operateurs));
+         var operateur = listes.filter(p => p.id == $('#Operateur').val())[0]
+         document.getElementById("smsDepot").innerText = null
+         $('#Frais').val(null)
+         var montant = Number($('#Montant').val())
+         var frais = operateur.tranches.filter(u => u.montant_sup >= montant && u.montant_inf <= montant).map(g => g.pourcentage * montant * 0.01);
+        
+         if (frais.length != 0)
+         {
+             $('#Frais').val(frais[0])
+
+         }
+         else {
+             document.getElementById("smsDepot").innerText = "Il n'exitse pas de tranche de transaction pour cette somme"
+
+         }
+
+
+    }
     function faireDepot()
     {
 
         var body = {
             Montant: $('#Montant').val(),
             Taxe: $('#Taxe').val(),
-            Commission: $('#Commission').val(),
             Frais: $('#Frais').val(),
             Telephone: $('#Telephone').val(),
             Operateur: $('#Operateur').val(),

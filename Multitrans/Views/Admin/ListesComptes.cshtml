@@ -105,13 +105,28 @@
 
                                 @foreach (var patient in Model.Item1)
                                 {
-                                    var roleU = (patient.role == "C") ? "Caissier(e)" : "Superviseur";
                                     var etat = (patient.status) ? "Activé" : "Désactivé";
 
                                     <tr>
                                         <td class="table-plus">@patient.nom</td>
+
                                         <td>@patient.prenom</td>
-                                        <td>@roleU </td>
+                                        @if (patient.role == "C")
+                                        {
+                                            <td>Caissier(e) </td>
+
+                                        }
+                                        @if (patient.role == "S")
+                                        {
+                                            <td>Superviseur </td>
+
+                                        }
+                                        @if (patient.role == "MANAGER")
+                                        {
+                                            <td>MANAGER </td>
+
+
+                                        }
                                         <td>@patient.telephone </td>
                                         <td>@Model.Item2.Where(p => p.id == patient.agenceID).Select(s => s.nom).FirstOrDefault() </td>
                                         <td>@etat </td>
@@ -213,9 +228,11 @@
                                 <div class="col-lg-6" style="width:100%">
                                     <label class="text" style="width:100%">Role</label>
                                     <select name="Role" id="Role" class="form-control" required>
-                                        <option value="0" selected> Choisir un role</option>
+                                        <option value="C"> Choisir un role</option>
                                         <option value="C">Caissier(e)</option>
                                         <option value="S">Superviseur</option>
+                                        <option value="MANAGER">Manager</option>
+
                                     </select>
                                 </div>
 
@@ -302,6 +319,8 @@
                                     <select name="RoleM" id="RoleM" class="form-control" required>
                                         <option value="C">Caissier(e)</option>
                                         <option value="S">Superviseur</option>
+                                        <option value="MANAGER">Manager</option>
+
                                     </select>
                                 </div>
                                 <input type="text" class="form-control" style="background-color:whitesmoke" id="compteIDM" name="compteIDM" hidden>

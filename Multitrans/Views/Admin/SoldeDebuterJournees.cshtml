@@ -3,6 +3,7 @@
     ViewData["Title"] = "Dashboard Manager";
     ViewData["UserName"] = Convert.ToString(Session["fullName"]);
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    var nb_operateur = Model.operateurs.Count();
 }
 @using Multitrans.Models
 @using PagedList.Mvc;
@@ -138,7 +139,7 @@
                 <div class="row">
                     <div class="col-md-6 col-sm-12">
                         <div class="title">
-                            <h4>Tableau de bord Solde Débuter Journées</h4>
+                            <h4>Tableau de bord Solde Débuter Journées </h4>
                         </div>
                         <nav aria-label="breadcrumb" role="navigation">
                             <ol class="breadcrumb">
@@ -398,8 +399,9 @@
                                                 <tr>
                                                     <td class="table-plus">@patient.id</td>
                                                     <td>@Model.agences.Where(t => t.id == patient.agenceID).Select(k => k.nom).FirstOrDefault()</td>
-                                                    <td>@Model.users.Where(t => t.id == patient.idU).Select(k =>k.prenom + " "+ k.nom).FirstOrDefault()</td>
+                                                    <td>@Model.users.Where(t => t.id == patient.idU).Select(k => k.prenom + " " + k.nom).FirstOrDefault()</td>
                                                     <td>@patient.caisse</td>
+                                                    @{ var reste = nb_operateur - patient.soldeDebuterJourneeItems.Count();}
                                                     @foreach (var item in patient.soldeDebuterJourneeItems)
                                                     {
                                                         if (item.montant != 0)
@@ -412,6 +414,14 @@
                                                             <td>0</td>
 
                                                         }
+
+                                                    }
+                                                    @for (int i = 0; i < reste; i ++)
+                                                    {
+
+                                                        <td>0</td>
+
+
 
                                                     }
                                                     @{ var date = (new DateTime(1970, 1, 1)).AddMilliseconds(Convert.ToDouble(patient.date)); }

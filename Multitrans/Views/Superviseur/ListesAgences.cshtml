@@ -1,0 +1,491 @@
+﻿@model  Tuple<List<AgenceDtoRequest>, List<Operateur>>
+@{ ViewBag.Title = "Liste des agences";
+    Layout = "~/Views/Shared/SuperviseurLayout.cshtml";
+    ViewData["UserName"] = Convert.ToString(Session["fullName"]);
+}
+@using Multitrans.Models;
+<style>
+
+    /* The Modal (background) */
+    .modal {
+        display: none; /* Hidden by default */
+        position: fixed; /* Stay in place */
+        padding-top: 20px; /* Location of the box */
+        left: 0;
+        top: 0;
+        width: 100%; /* Full width */
+        height: 100%; /* Full height */
+        overflow: auto; /* Enable scroll if needed */
+        background-color: rgb(0,0,0); /* Fallback color */
+        background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+    }
+
+    /* Modal Content */
+    .modal-content {
+        background-color: #fefefe;
+        margin: auto;
+        padding: 20px;
+        border: 1px solid #888;
+        width: 80%;
+    }
+
+    /* The Close Button */
+    .close {
+        color: #aaaaaa;
+        float: right;
+        font-size: 28px;
+        font-weight: bold;
+    }
+
+        .close:hover,
+        .close:focus {
+            color: #000;
+            text-decoration: none;
+            cursor: pointer;
+        }
+</style>
+
+<div class="main-container">
+    <div class="xs-pd-20-10 pd-ltr-20">
+
+        <div class="page-header">
+            <div class="row">
+                <div class="col-md-6 col-sm-12">
+                    <div class="title">
+                        <h4>Administration</h4>
+                    </div>
+                    <nav aria-label="breadcrumb" role="navigation">
+                        <ol class="breadcrumb">
+                            <li class="breadcrumb-item">
+                                <a href="index.html">Acceuil</a>
+                            </li>
+                            <li class="breadcrumb-item active" aria-current="page">
+                                Liste Agences
+                            </li>
+                        </ol>
+                    </nav>
+                </div>
+                <div class="col-md-6 col-sm-12 text-right">
+                    <a class="btn btn-primary"
+                       style="color:white"
+                       onclick=" document.getElementById('mediumModalCreate').style.display = 'block'">
+                        Nouvelle Agence
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Export Datatable start -->
+        <div class="card-box mb-30">
+            <div class="pb-20">
+
+                @if (Model.Item1.Count < 1)
+                {
+
+                    <center>
+                        <h2>Aucune agence </h2>
+                    </center>
+                }
+                else
+                {
+                    <table class="table hover multiple-select-row data-table-export nowrap">
+                        <thead>
+                            <tr>
+                                <th>N° </th>
+                                <th>Nom</th>
+                                <th>Adresse</th>
+                                <th>Longitude</th>
+                                <th>Latitude</th>
+                                <th>Date Enregistrement</th>
+                                <th class="table-plus datatable-nosort">Actions</th>
+
+                            </tr>
+                        </thead>
+                        <tbody>
+
+                            @foreach (var patient in Model.Item1.OrderByDescending(o=>o.id))
+                            {
+
+                                <tr>
+                                    <td class="table-plus">@patient.id</td>
+                                    <td>@patient.nom</td>
+                                    <td>@patient.adresse</td>
+                                    <td>@patient.longitude</td>
+                                    <td>@patient.latitude</td>
+                                    @{ var naiss_date = new DateTime(patient.date_creation.Value); }
+                                    <td>@naiss_date </td>
+                                    <td>
+                                        <div class="dropdown">
+                                            <a class="btn btn-link font-24 p-0 line-height-1 no-arrow dropdown-toggle"
+                                               href="#"
+                                               role="button"
+                                               data-toggle="dropdown">
+                                                <i class="dw dw-more"></i>
+                                            </a>
+                                            <div class="dropdown-menu dropdown-menu-right dropdown-menu-icon-list">
+                                                <button class="dropdown-item" onclick="ouvrirDepartementModal(@patient.id)"><i class="dw dw-edit2"></i> Modifier</button>
+                                                <button class="dropdown-item" onclick=" bloquageModal(@patient.id)"><i class="dw dw-lock"></i> Bloquer</button>
+                                            </div>
+                                        </div>
+
+                                    </td>
+
+                                </tr>
+
+                            }
+
+
+                        </tbody>
+                    </table>
+                }
+
+            </div>
+        </div>
+        <!-- Export Datatable End -->
+
+
+
+
+
+
+
+    </div>
+</div>
+<!-- CREER AGENCE POPUP-->
+<div id="mediumModalCreate" class="modal container-fluid ">
+    <div class="container" style="width:70%;float:right">
+        <div class="row">
+            <div class="card" style="width:70%">
+                <center> <p style="background-color: white" class="text-warning">Veuillez renseigner les champs</p></center>
+                <div class="card-body">
+                    <center> <p style="background-color: white; color: red" id="sms"></p></center>
+                    <center> <p style="background-color:white;color:green" id="message"></p></center>
+                    <div class="row">
+                        <div class="col-lg-6 col-xl-6 col-sm-6 col-md-6">
+                            <div class="input-group input-group-outline">
+                                <label class="text" style="width:100%">Agence <span style="color: red">*</span> </label>
+                                <input type="text" id="Name" name="Name" class="form-control" required>
+                            </div>
+                        </div>
+                        <div class="col-lg-6 col-xl-6 col-sm-6 col-md-6">
+                            <div class="input-group input-group-outline">
+                                <label class="text" style="width:100%">Adresse <span style="color: red">*</span> </label>
+                                <input type="text" id="adresse" name="adresse" class="form-control" required>
+                            </div>
+                        </div>
+                        <div class="col-lg-6 col-xl-6 col-sm-6 col-md-6">
+                            <div class="input-group input-group-outline">
+                                <label class="text" style="width:100%">Longitude </label>
+                                <input type="text" id="longitude" name="longitude" class="form-control">
+                            </div>
+                        </div>
+                        <div class="col-lg-6 col-xl-6 col-sm-6 col-md-6">
+                            <div class="input-group input-group-outline">
+                                <label class="text" style="width:100%">Latitude </label>
+                                <input type="text" id="latitude" name="latitude" class="form-control">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-12 col-xl-12 col-sm-12 col-md-12">
+                            <div class="input-group input-group-outline mb-3">
+                                <label class="text" style="width:100%">Affecter des opérateurs</label>
+                                <select class="form-control" style="width: 100%"  name="Operateur[]" id="Operateur" multiple="multiple">
+                                    @foreach (var operateur in Model.Item2)
+                                    {
+                                        <option value="@operateur.id">@operateur.libelle</option>
+                                    }
+
+                                </select>
+                            </div>
+
+
+                        </div>_
+                        
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-6 col-xl-6 col-sm-6 col-md-6 p-2">
+                            <a class="btn btn-primary" onclick="ajouterAgence()" style="color: white; width: 100%"> Enregistrer</a>
+                        </div>
+                        <div class="col-lg-6 col-xl-6 col-sm-6 col-md-6 p-2">
+                            <a class="btn btn-primary" onclick=" document.getElementById('mediumModalCreate').style.display = 'none';window.location.reload()" style="color: white; width: 100% ">Fermer</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<input id="departementID" name="departementID" type="text" class="form-control" hidden>
+
+<!-- END CREER PERSONNEL POPUP-->
+<!-- MODIFIER PERSONNEL POPUP-->
+<div id="mediumModalModify" class="modal container-fluid ">
+    <div class="container" style="width:70%;float:right">
+        <div class="row">
+            <div class="card" style="width:70%">
+                <center> <p style="background-color: white" class="text-warning">Veuillez renseigner les champs</p></center>
+                <div class="card-body">
+                    <center>
+                        <p id="messadeAjouterDepartementM" style="color: green"></p>
+                        <p id="smsAjouterDepartementM" style="color:red"></p>
+                    </center>
+                    <div class="row">
+                        <div class="col-lg-6 col-xl-6 col-sm-6 col-md-6">
+                            <div class="input-group input-group-outline">
+                                <label class="text" style="width:100%">Agence <span style="color: red">*</span> </label>
+                                <input type="text" id="nomM" name="nomM" class="form-control" required>
+                            </div>
+                        </div>
+                        <div class="col-lg-6 col-xl-6 col-sm-6 col-md-6">
+                            <div class="input-group input-group-outline">
+                                <label class="text" style="width:100%">Adresse <span style="color: red">*</span> </label>
+                                <input type="text" id="adresseM" name="adresseM" class="form-control" required>
+                            </div>
+                        </div>
+                        <div class="col-lg-6 col-xl-6 col-sm-6 col-md-6">
+                            <div class="input-group input-group-outline">
+                                <label class="text" style="width:100%">Longitude </label>
+                                <input type="text" id="longitudeM" name="longitudeM" class="form-control">
+                            </div>
+                        </div>
+                        <div class="col-lg-6 col-xl-6 col-sm-6 col-md-6">
+                            <div class="input-group input-group-outline">
+                                <label class="text" style="width:100%">Latitude </label>
+                                <input type="text" id="latitudeM" name="latitudeM" class="form-control">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-12 col-xl-12 col-sm-12 col-md-12">
+                            <div class="input-group input-group-outline mb-3">
+                                <label class="text" style="width:100%">Affecter des opérateurs</label>
+                                <select class="form-control" style="width: 100%" name="OperateurM[]" id="OperateurM" multiple="multiple">
+                                    
+                                </select>
+                            </div>
+
+
+                        </div>_
+
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-6 col-xl-6 col-sm-6 col-md-6 p-2">
+                            <a class="btn btn-primary" onclick="modifierDepartement()" style="color: white; width: 100%"> Enregistrer</a>
+                        </div>
+                        <div class="col-lg-6 col-xl-6 col-sm-6 col-md-6 p-2">
+                            <a class="btn btn-primary" onclick=" document.getElementById('mediumModalModify').style.display = 'none'" style="color: white; width: 100% ">Fermer</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>    
+</div>
+
+<!-- END MODIFIER PERSONNEL POPUP-->
+<!-- BLOQUER PERSONNEL POPUP-->
+<div id="mediumModalBloquer" class="modal container-fluid ">
+
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content align-content-center">
+            <div class="modal-header">
+                <h5 class="modal-title" id="mediumModalLabelBloquer">Bloquer un département</h5>
+
+            </div>
+            <div class="modal-body align-content-center">
+                <center>
+                    <h5 class="text-center">Voulez-vous bloquer ce département ?</h5>
+                </center>
+
+
+                <div class="container">
+                    <div class="row">
+                        <button type="button" class="btn btn-primary" onclick="bloquerDepartement()"><span id="spinnerB" class="spinner-border text-light" role="status" hidden></span>Oui</button>
+                        <button type="button" style="float:right" class="btn btn-danger" onclick="document.getElementById('mediumModalBloquer').style.display = 'none';window.location.reload()">Non</button>
+                    </div>
+
+
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+<!-- END MODIFIER PERSONNEL POPUP-->
+
+<script>
+    $(document).ready(function () {
+        $('#Operateur').select2();
+
+    });
+    $(document).ready(function () {
+        $('#OperateurM').select2();
+
+    });
+    function ajouterAgence()
+    {
+        document.getElementById("message").innerText = null
+        document.getElementById("sms").innerText = null
+         $.post('@Url.Action("AjouterAgence")',
+            {
+                nom: document.getElementById('Name').value,
+                adresse: document.getElementById('adresse').value,
+                longitude: document.getElementById('longitude').value,
+                latitude: document.getElementById('latitude').value,
+                operateurs: $('#Operateur').val()
+
+            },
+            function (rep)
+            {
+                if (rep.code == 200)
+                {
+                    document.getElementById("message").innerText = rep.message;
+                    document.getElementById("sms").innerText = null
+                    setTimeout(() => { document.getElementById('mediumModalCreate').style.display = 'none'; window.location.reload() }, 1000);
+                }
+                else
+                {
+                    document.getElementById("sms").innerText = rep.message ;
+                    document.getElementById("message").innerText = null
+
+                }
+
+
+
+            }).fail(function (xhr, status, error) {
+                document.getElementById("sms").innerText = " une erreur interne est survenue";
+                document.getElementById("message").innerText = null
+
+            });
+
+
+
+    }
+    function modifierDepartement()
+    {
+        document.getElementById("messadeAjouterDepartementM").innerText = null
+        document.getElementById("smsAjouterDepartementM").innerText = null
+         $.post('@Url.Action("AjouterAgence")',
+            {
+                nom: document.getElementById('nomM').value,
+                adresse: document.getElementById('adresseM').value,
+                longitude: document.getElementById('longitudeM').value,
+                latitude: document.getElementById('latitudeM').value,
+                id: document.getElementById('departementID').value,
+                operateurs: $('#OperateurM').val()
+
+            },
+            function (rep)
+            {
+                if (rep.code == 200)
+                {
+                    document.getElementById("messadeAjouterDepartementM").innerText = rep.message;
+                    document.getElementById("smsAjouterDepartementM").innerText = null
+                    setTimeout(() => { document.getElementById('mediumModalModify').style.display = 'none'; window.location.reload() }, 1000);
+                }
+                else
+                {
+                    document.getElementById("smsAjouterDepartementM").innerText = rep.message ;
+                    document.getElementById("messadeAjouterDepartementM").innerText = null
+
+                }
+
+
+
+            }).fail(function (xhr, status, error) {
+                document.getElementById("smsAjouterDepartementM").innerText = " une erreur interne est survenue";
+                document.getElementById("messadeAjouterDepartementM").innerText = null
+
+            });
+
+
+
+    }
+    function ouvrirDepartementModal(departementID)
+    {
+        document.getElementById("messadeAjouterDepartementM").innerText = null
+        document.getElementById("smsAjouterDepartementM").innerText = null
+        var operateurs = @Html.Raw(Json.Encode(Model.Item2));
+
+        var departements = @Html.Raw(Json.Encode(Model.Item1));
+        var departement = departements.filter(e => e.id == departementID)[0];
+
+            document.getElementById('departementID').value = departementID
+            document.getElementById('nomM').value = departement.nom,
+            document.getElementById('adresseM').value = departement.adresse,
+            document.getElementById('latitudeM').value = departement.latitude,
+                document.getElementById('longitudeM').value = departement.longitude,
+                $("#OperateurM").empty()
+
+                operateurs.forEach(p =>
+                {
+                    if (departement.operateurs.includes(String(p.id)))
+                    {
+                        $("#OperateurM").append('<option value="' + p.id + '" selected>' + p.libelle + '</option>')
+
+                    }
+                    else
+                    {
+                        $("#OperateurM").append('<option value="' + p.id + '">' + p.libelle + '</option>')
+
+
+                    }
+
+                }
+
+            )
+
+
+
+            document.getElementById('mediumModalModify').style.display = 'block'
+
+
+
+
+     }
+    function ouvrirBloquerModal(departementID)
+    {
+        document.getElementById('mediumModalBloquer').style.display = 'block'
+        document.getElementById('departementID').value = departementID
+
+
+
+    }
+    function bloquerDepartement()
+    {
+        document.getElementById("messageDepartementB").innerText = null
+        document.getElementById("smsDepartementB").innerText = null
+
+             $.post('@Url.Action("desactiverAgence")',
+
+                {
+                    id: document.getElementById('departementID').value
+                },
+            function (rep)
+            {
+                if (rep.code == 200)
+                {
+
+                    document.getElementById("messageDepartementB").innerText = rep.message;
+                    document.getElementById("smsDepartementB").innerText = null
+                    window.location.reload()
+                }
+                else
+                {
+                    document.getElementById("smsDepartementB").innerText = rep.message;
+                    document.getElementById("messageDepartementB").innerText = null
+                }
+            }
+            ).fail(function (xhr, status, error)
+            {
+                                //Ajax request failed.
+                document.getElementById("smsDepartementB").innerText = " une erreur interne est survenue coté client";
+                document.getElementById("messageDepartementB").innerText = null
+
+            });
+    }
+
+
+</script>

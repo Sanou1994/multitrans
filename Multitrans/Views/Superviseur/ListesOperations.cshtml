@@ -1,0 +1,124 @@
+﻿@model  List<Operation>
+@{ ViewBag.Title = "Liste des Opérations";
+    Layout = "~/Views/Shared/SuperviseurLayout.cshtml";
+    ViewData["UserName"] = Convert.ToString(Session["fullName"]);
+}
+@using Multitrans.Models;
+<style>
+
+    /* The Modal (background) */
+    .modal {
+        display: none; /* Hidden by default */
+        position: fixed; /* Stay in place */
+        padding-top: 20px; /* Location of the box */
+        left: 0;
+        top: 0;
+        width: 100%; /* Full width */
+        height: 100%; /* Full height */
+        overflow: auto; /* Enable scroll if needed */
+        background-color: rgb(0,0,0); /* Fallback color */
+        background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+    }
+
+    /* Modal Content */
+    .modal-content {
+        background-color: #fefefe;
+        margin: auto;
+        padding: 20px;
+        border: 1px solid #888;
+        width: 80%;
+    }
+
+    /* The Close Button */
+    .close {
+        color: #aaaaaa;
+        float: right;
+        font-size: 28px;
+        font-weight: bold;
+    }
+
+        .close:hover,
+        .close:focus {
+            color: #000;
+            text-decoration: none;
+            cursor: pointer;
+        }
+</style>
+
+<div class="main-container">
+    <div class="xs-pd-20-10 pd-ltr-20">
+
+        <div class="page-header">
+            <div class="row">
+                <div class="col-md-6 col-sm-12">
+                    <div class="title">
+                        <h4>Administration</h4>
+                    </div>
+                    <nav aria-label="breadcrumb" role="navigation">
+                        <ol class="breadcrumb">
+                            <li class="breadcrumb-item">
+                                <a href="index.html">Acceuil</a>
+                            </li>
+                            <li class="breadcrumb-item active" aria-current="page">
+                                Liste Opérations
+                            </li>
+                        </ol>
+                    </nav>
+                </div>
+                
+            </div>
+        </div>
+          <center> <h4 style="background-color:white;color:red" id="smsB"></h4></center>
+            <center> <h4 style="background-color:white;color:green" id="messageB"></h4></center>
+        
+        <!-- Export Datatable start -->
+        <div class="card-box mb-30">
+            <div class="pb-20">
+
+                @if (Model.Count < 1)
+                {
+
+                    <center>
+                        <h2>Aucune opération disponible </h2>
+                    </center>
+                }
+                else
+                {
+                    <table class="table hover multiple-select-row data-table-export nowrap">
+                        <thead>
+                            <tr>
+                                <th>N° </th>
+                                <th>Nom</th>
+                                <th>Sens</th>
+                                <th>Etat</th>
+
+                            </tr>
+                        </thead>
+                        <tbody>
+
+                            @foreach (var patient in Model)
+                            {
+                                var etat = (patient.status.Value) ? "Activé" : "Désactivé";
+
+                                <tr>
+                                    <td class="table-plus">@patient.id</td>
+                                    <td>@patient.libelle</td>
+                                    <td>@patient.sens</td>
+                                    <td>@etat</td>
+                                    
+
+                                </tr>
+
+                            }
+
+
+                        </tbody>
+                    </table>
+                }
+
+            </div>
+        </div>
+        <!-- Export Datatable End -->
+
+    </div>
+</div>

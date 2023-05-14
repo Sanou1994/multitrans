@@ -85,7 +85,24 @@ namespace Multitrans.Repositories
 
             return reponse;
         }
-    }
+
+		public Reponse ListeUserByAgence(long? id, string tokenKey)
+		{
+			Reponse reponse = new Reponse();
+			try
+			{
+				reponse = _callApi.CallBackendGet($"/users/agence/{id}", tokenKey);
+				reponse.code = 200;
+			}
+			catch (Exception)
+			{
+				reponse.code = 500;
+				reponse.message = "Une erreur interne coté client";
+			}
+
+			return reponse;
+		}
+	}
 }
 
 
